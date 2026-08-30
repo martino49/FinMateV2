@@ -29,7 +29,7 @@ const dashboardController = {
          ORDER BY user_count DESC`
       );
 
-      console.log('📊 Dashboard data loaded:', {
+      console.log('Dashboard data loaded:', {
         totalUsers: userCount[0].count,
         totalRoles: roleCount[0].count,
         totalTeams: teamCount[0].count,
@@ -52,7 +52,7 @@ const dashboardController = {
       });
 
     } catch (error) {
-      console.error('❌ Dashboard error:', error);
+      console.error('Dashboard error:', error);
       // Provide fallback data to prevent template errors
       res.render('superAdmin/dashboard', {
         title: 'Super Admin Dashboard - FinMate',

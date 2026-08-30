@@ -182,7 +182,7 @@ const initDatabase = async () => {
       amount DECIMAL(10,2) NOT NULL,
       description TEXT,
       category VARCHAR(100),
-      due_date DATE NOT NULL,
+      planned_date DATE NOT NULL,
       status ENUM('pending','paid','cancelled') DEFAULT 'pending',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -290,7 +290,7 @@ const initDatabase = async () => {
 
     // Add planned_date and recurrence to planned_expenses if missing
     try {
-      await execute(`ALTER TABLE planned_expenses ADD COLUMN planned_date DATE AFTER due_date`);
+      await execute(`ALTER TABLE planned_expenses ADD COLUMN planned_date DATE AFTER category`);
     } catch { /* column exists */ }
     try {
       await execute(`ALTER TABLE planned_expenses ADD COLUMN recurrence ENUM('none','weekly','monthly','yearly') DEFAULT 'none' AFTER status`);

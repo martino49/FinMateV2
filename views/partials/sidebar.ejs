@@ -1,0 +1,113 @@
+<%
+    // Normalize parameters - views use either currentPage or activePage
+    var activePage = (typeof currentPage !== 'undefined' && currentPage) ? currentPage : (typeof activePage !== 'undefined' ? activePage : '');
+    var userName = (typeof user !== 'undefined' && user) ? (user.first_name || user.username || user.email) : '';
+    var notifCount = (typeof notificationCount !== 'undefined') ? notificationCount : 0;
+%>
+<style>
+    .sidebar {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .sidebar .nav-link {
+        color: #fff;
+        padding: 12px 20px;
+        margin: 4px 0;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    .sidebar .nav-link:hover {
+        background: rgba(255,255,255,0.1);
+        transform: translateX(5px);
+    }
+    .sidebar .nav-link.active {
+        background: rgba(255,255,255,0.2);
+        font-weight: bold;
+    }
+    .sidebar-brand {
+        color: #fff;
+        font-size: 1.25rem;
+        font-weight: 700;
+        padding: 1.5rem 1rem;
+        text-align: center;
+    }
+</style>
+<nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+    <div class="position-sticky pt-3">
+        <div class="sidebar-brand">
+            <i class="fas fa-chart-line me-2"></i>FinMate
+        </div>
+        <% if (userName) { %>
+            <div class="text-center text-white-50 mb-3 px-3">
+                <small><i class="fas fa-user me-1"></i><%= userName %></small>
+            </div>
+        <% } %>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link <%= activePage === 'dashboard' ? 'active' : '' %>" href="/user/dashboard">
+                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= activePage === 'expenses' ? 'active' : '' %>" href="/user/expenses">
+                    <i class="fas fa-receipt me-2"></i>Expenses
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= activePage === 'incomes' ? 'active' : '' %>" href="/user/incomes">
+                    <i class="fas fa-money-bill-wave me-2"></i>Incomes
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= activePage === 'budgets' ? 'active' : '' %>" href="/user/budgets">
+                    <i class="fas fa-wallet me-2"></i>Budgets
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= activePage === 'savings' ? 'active' : '' %>" href="/user/savings">
+                    <i class="fas fa-piggy-bank me-2"></i>Savings Goals
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= activePage === 'planned-expenses' ? 'active' : '' %>" href="/user/planned-expenses">
+                    <i class="fas fa-calendar-check me-2"></i>Planned Expenses
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= activePage === 'upcoming-expenses' ? 'active' : '' %>" href="/user/upcoming-expenses">
+                    <i class="fas fa-clock me-2"></i>Upcoming Expenses
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= activePage === 'analytics' ? 'active' : '' %>" href="/user/analytics">
+                    <i class="fas fa-chart-bar me-2"></i>Analytics
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= activePage === 'notifications' ? 'active' : '' %>" href="/user/notifications">
+                    <i class="fas fa-bell me-2"></i>Notifications
+                    <% if (notifCount > 0) { %>
+                        <span class="badge bg-danger float-end"><%= notifCount %></span>
+                    <% } %>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= activePage === 'settings' ? 'active' : '' %>" href="/user/settings">
+                    <i class="fas fa-cog me-2"></i>Settings
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= activePage === 'profile' ? 'active' : '' %>" href="/user/profile">
+                    <i class="fas fa-user me-2"></i>Profile
+                </a>
+            </li>
+            <li class="nav-item mt-3">
+                <a class="nav-link" href="/auth/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a>
+                <form id="logout-form" action="/auth/logout" method="POST" style="display: none;"></form>
+            </li>
+        </ul>
+    </div>
+</nav>

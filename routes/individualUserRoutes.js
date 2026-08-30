@@ -113,7 +113,7 @@ const getDashboardData = async (userId, role = 'individual_user') => {
     const plannedRows = await db.execute(
       `SELECT COUNT(*) AS plannedExpenses 
        FROM planned_expenses 
-       WHERE user_id = ? AND due_date >= CURDATE()`,
+       WHERE user_id = ? AND planned_date >= CURDATE()`,
       [userId]
     );
 
@@ -1347,7 +1347,7 @@ router.get('/planned-expenses', asyncHandler(async (req, res) => {
   const plannedExpenses = await safeQuery(
     `SELECT * FROM planned_expenses 
      WHERE user_id = ? 
-     ORDER BY due_date ASC`,
+     ORDER BY planned_date ASC`,
     [userId]
   );
 
@@ -1400,16 +1400,16 @@ router.get('/planned-expenses/add', asyncHandler(async (req, res) => {
 // FIXED: Add Planned Expense route
 router.post('/planned-expenses/add', asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const { amount, description, category, due_date, recurrence } = req.body;
+  const { amount, description, category, planned_date, recurrence } = req.body;
 
   try {
     const db = require('../config/db');
     
     const result = await db.execute(
       `INSERT INTO planned_expenses 
-       (user_id, amount, description, category, due_date, recurrence, status, created_at)
+       (user_id, amount, description, category, planned_date, recurrence, status, created_at)
        VALUES (?, ?, ?, ?, ?, ?, 'planned', NOW())`,
-      [userId, parseFloat(amount), description, category, due_date, recurrence || 'once']
+      [userId, parseFloat(amount), description, category, planned_date, recurrence || 'once']
     );
 
     if (result.affectedRows > 0) {

@@ -7,8 +7,8 @@ async function safeQuery(sql, params = []) {
     // Normalize output
     const rows = Array.isArray(result[0]) ? result[0] : result;
 
-    console.log('✅ Query Result Type:', Array.isArray(rows) ? 'Array' : typeof rows);
-    console.log('✅ Query Returned:', Array.isArray(rows) ? rows.length + ' rows' : JSON.stringify(rows));
+    console.log('Query Result Type:', Array.isArray(rows) ? 'Array' : typeof rows);
+    console.log('Query Returned:', Array.isArray(rows) ? rows.length + ' rows' : JSON.stringify(rows));
 
     // Return consistent data
     if (sql.trim().toUpperCase().startsWith('SELECT')) {
@@ -17,7 +17,7 @@ async function safeQuery(sql, params = []) {
 
     return rows;
   } catch (error) {
-    console.error('❌ Database query failed:', error.message);
+    console.error('Database query failed:', error.message);
     if (sql.trim().toUpperCase().startsWith('SELECT')) {
       return [];
     }

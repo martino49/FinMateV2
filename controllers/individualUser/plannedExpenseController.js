@@ -10,7 +10,7 @@ const getPlannedExpenses = async (req, res) => {
     `;
     const [plannedExpenses] = await pool.execute(query, [userId]);
     
-    res.render('individualUser/planned-expenses/list', { // ✅ FIXED: hyphen
+    res.render('individualUser/planned-expenses/list', { // FIXED: hyphen
       title: 'Planned Expenses',
       currentPage: 'planned-expenses',
       user: req.user,
@@ -18,7 +18,7 @@ const getPlannedExpenses = async (req, res) => {
     });
   } catch (error) {
     console.error('Get planned expenses error:', error);
-    res.status(500).render('individualUser/planned-expenses/list', { // ✅ FIXED: hyphen
+    res.status(500).render('individualUser/planned-expenses/list', { // FIXED: hyphen
       title: 'Planned Expenses',
       currentPage: 'planned-expenses',
       user: req.user,
@@ -28,7 +28,7 @@ const getPlannedExpenses = async (req, res) => {
 };
 
 const getAddPlannedExpense = async (req, res) => {
-  res.render('individualUser/planned-expenses/add', { // ✅ FIXED: hyphen
+  res.render('individualUser/planned-expenses/add', { // FIXED: hyphen
     title: 'Add Planned Expense',
     currentPage: 'planned-expenses',
     user: req.user
@@ -49,7 +49,7 @@ const postAddPlannedExpense = async (req, res) => {
     res.redirect('/user/planned-expenses?success=true&message=Planned expense added successfully');
   } catch (error) {
     console.error('Add planned expense error:', error);
-    res.render('individualUser/planned-expenses/add', { // ✅ FIXED: hyphen
+    res.render('individualUser/planned-expenses/add', { // FIXED: hyphen
       title: 'Add Planned Expense',
       currentPage: 'planned-expenses',
       user: req.user,
@@ -73,7 +73,7 @@ const getEditPlannedExpense = async (req, res) => {
       });
     }
     
-    res.render('individualUser/planned-expenses/edit', { // ✅ FIXED: hyphen
+    res.render('individualUser/planned-expenses/edit', { // FIXED: hyphen
       title: 'Edit Planned Expense',
       currentPage: 'planned-expenses',
       user: req.user,
@@ -81,7 +81,7 @@ const getEditPlannedExpense = async (req, res) => {
     });
   } catch (error) {
     console.error('Get edit planned expense error:', error);
-    res.status(500).render('individualUser/planned-expenses/edit', { // ✅ FIXED: hyphen
+    res.status(500).render('individualUser/planned-expenses/edit', { // FIXED: hyphen
       title: 'Edit Planned Expense',
       currentPage: 'planned-expenses',
       user: req.user,
@@ -106,7 +106,7 @@ const postEditPlannedExpense = async (req, res) => {
     res.redirect('/user/planned-expenses?success=true&message=Planned expense updated successfully');
   } catch (error) {
     console.error('Edit planned expense error:', error);
-    res.render('individualUser/planned-expenses/edit', { // ✅ FIXED: hyphen
+    res.render('individualUser/planned-expenses/edit', { // FIXED: hyphen
       title: 'Edit Planned Expense',
       currentPage: 'planned-expenses',
       user: req.user,

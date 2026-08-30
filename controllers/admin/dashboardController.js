@@ -3,7 +3,7 @@ const db = require('../../config/db');
 
 const getDashboard = async (req, res) => {
   try {
-    console.log('👑 Admin dashboard accessed by:', req.user.email, 'Role:', req.user.role_name);
+    console.log('Admin dashboard accessed by:', req.user.email, 'Role:', req.user.role_name);
     
     // Get dashboard statistics
     const [userCount] = await db.pool.execute('SELECT COUNT(*) as count FROM users WHERE is_active = TRUE');
@@ -47,7 +47,7 @@ const getDashboard = async (req, res) => {
       recentExpenses: recentExpenses
     });
   } catch (error) {
-    console.error('💥 Admin dashboard error:', error);
+    console.error('Admin dashboard error:', error);
     res.render('admin/dashboard', {
       title: 'Admin Dashboard - FinMate',
       user: req.user,

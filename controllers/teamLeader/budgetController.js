@@ -13,7 +13,7 @@ const getBudgets = async (req, res) => {
       budgets: budgets || []
     });
   } catch (error) {
-    console.error('💥 Budgets error:', error);
+    console.error('Budgets error:', error);
     res.render('team-leader/budgets', {
       title: 'Team Budgets - FinMate',
       user: req.user,
@@ -45,7 +45,7 @@ const postCreateBudget = async (req, res) => {
     );
     res.redirect('/team-leader/budgets?success=Budget created successfully');
   } catch (error) {
-    console.error('💥 Create budget error:', error);
+    console.error('Create budget error:', error);
     res.redirect('/team-leader/budgets/create?error=Failed to create budget');
   }
 };
@@ -67,7 +67,7 @@ const getEditBudget = async (req, res) => {
       budget: budgets[0]
     });
   } catch (error) {
-    console.error('💥 Edit budget error:', error);
+    console.error('Edit budget error:', error);
     res.redirect('/team-leader/budgets?error=Failed to load budget');
   }
 };
@@ -81,7 +81,7 @@ const postEditBudget = async (req, res) => {
     );
     res.redirect('/team-leader/budgets?success=Budget updated successfully');
   } catch (error) {
-    console.error('💥 Update budget error:', error);
+    console.error('Update budget error:', error);
     res.redirect('/team-leader/budgets/edit/' + req.params.id + '?error=Failed to update budget');
   }
 };
@@ -94,7 +94,7 @@ const deleteBudget = async (req, res) => {
     );
     res.redirect('/team-leader/budgets?success=Budget deleted successfully');
   } catch (error) {
-    console.error('💥 Delete budget error:', error);
+    console.error('Delete budget error:', error);
     res.redirect('/team-leader/budgets?error=Failed to delete budget');
   }
 };
@@ -127,7 +127,7 @@ const getBudgetOverview = async (req, res) => {
     
     res.json(overview[0] || {});
   } catch (error) {
-    console.error('💥 Budget overview error:', error);
+    console.error('Budget overview error:', error);
     res.status(500).json({ error: 'Failed to fetch budget overview' });
   }
 };

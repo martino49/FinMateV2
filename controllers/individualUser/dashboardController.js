@@ -180,7 +180,7 @@ const dashboardService = {
 //       error: req.query.error || ''
 //     });
 //   } catch (error) {
-//     console.error('❌ Dashboard controller error:', error);
+//     console.error('Dashboard controller error:', error);
 //     const emptyData = {
 //       userId: null,
 //       totalSavings: 0,
@@ -241,7 +241,7 @@ const getDashboard = async (req, res) => {
       error: ''
     });
   } catch (error) {
-    console.error('❌ Dashboard test render error:', error);
+    console.error('Dashboard test render error:', error);
     return res.render('individualUser/dashboard', {
       title: 'Personal Dashboard',
       user: req.user || { name: 'Test User' },
