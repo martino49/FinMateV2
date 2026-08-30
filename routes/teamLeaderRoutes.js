@@ -9,7 +9,7 @@ router.use(authorize(['team_leader', 'admin', 'super_admin']));
 
 // Dashboard - Render EJS template
 router.get('/dashboard', (req, res) => {
-  console.log('👥 Team Leader dashboard accessed by:', req.user.email);
+  console.log('Team Leader dashboard accessed by:', req.user.email);
   
   res.render('teamLeader/dashboard', {
     title: 'Team Leader Dashboard - FinMate',
@@ -53,60 +53,45 @@ router.get('/dashboard', (req, res) => {
 
 // Main Pages - Render EJS templates
 router.get('/teams', (req, res) => {
-  res.render('teamLeader/teams', {
+  res.render('teamLeader/teams/index', {
     title: 'Team Management - FinMate',
     user: req.user
   });
 });
 
 router.get('/expenses', (req, res) => {
-  res.render('teamLeader/expenses', {
+  res.render('teamLeader/expenses/index', {
     title: 'Expense Management - FinMate',
     user: req.user
   });
 });
 
 router.get('/planned-expenses', (req, res) => {
-  res.render('teamLeader/planned-expenses', {
+  res.render('teamLeader/plannedExpenses/index', {
     title: 'Planned Expenses - FinMate',
     user: req.user
   });
 });
 
 router.get('/budgets', (req, res) => {
-  res.render('teamLeader/budgets', {
-    title: 'Budget Management - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/dashboard');
 });
 
 router.get('/members', (req, res) => {
-  res.render('teamLeader/members', {
-    title: 'Team Members - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/dashboard');
 });
 
 router.get('/reports', (req, res) => {
-  res.render('teamLeader/reports', {
-    title: 'Reports - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/dashboard');
 });
 
 router.get('/notifications', (req, res) => {
-  res.render('teamLeader/notifications', {
-    title: 'Notifications - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/dashboard');
 });
 
 // Team management routes
 router.get('/teams/edit', (req, res) => {
-  res.render('teamLeader/team-edit', {
-    title: 'Edit Team - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/teams');
 });
 
 router.post('/teams/edit', (req, res) => {
@@ -115,18 +100,12 @@ router.post('/teams/edit', (req, res) => {
 });
 
 router.get('/teams/settings', (req, res) => {
-  res.render('teamLeader/team-settings', {
-    title: 'Team Settings - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/teams');
 });
 
 // Member management routes
 router.get('/members/add', (req, res) => {
-  res.render('teamLeader/member-add', {
-    title: 'Add Member - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/members');
 });
 
 router.post('/members/add', (req, res) => {
@@ -135,11 +114,7 @@ router.post('/members/add', (req, res) => {
 });
 
 router.get('/members/edit/:id', (req, res) => {
-  res.render('teamLeader/member-edit', {
-    title: 'Edit Member - FinMate',
-    user: req.user,
-    memberId: req.params.id
-  });
+  res.redirect('/team-leader/members');
 });
 
 router.post('/members/edit/:id', (req, res) => {
@@ -153,41 +128,24 @@ router.post('/members/remove/:id', (req, res) => {
 });
 
 router.get('/members/profile/:id', (req, res) => {
-  res.render('teamLeader/member-profile', {
-    title: 'Member Profile - FinMate',
-    user: req.user,
-    memberId: req.params.id
-  });
+  res.redirect('/team-leader/members');
 });
 
 // Expense management routes
 router.get('/expenses/pending', (req, res) => {
-  res.render('teamLeader/expenses-pending', {
-    title: 'Pending Expenses - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/expenses');
 });
 
 router.get('/expenses/approved', (req, res) => {
-  res.render('teamLeader/expenses-approved', {
-    title: 'Approved Expenses - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/expenses');
 });
 
 router.get('/expenses/rejected', (req, res) => {
-  res.render('teamLeader/expenses-rejected', {
-    title: 'Rejected Expenses - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/expenses');
 });
 
 router.get('/expenses/view/:id', (req, res) => {
-  res.render('teamLeader/expense-view', {
-    title: 'Expense Details - FinMate',
-    user: req.user,
-    expenseId: req.params.id
-  });
+  res.redirect('/team-leader/expenses');
 });
 
 router.post('/expenses/approve/:id', (req, res) => {
@@ -212,10 +170,7 @@ router.get('/expenses/export', (req, res) => {
 
 // Planned expenses routes
 router.get('/planned-expenses/add', (req, res) => {
-  res.render('teamLeader/planned-expense-add', {
-    title: 'Add Planned Expense - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/planned-expenses');
 });
 
 router.post('/planned-expenses/add', (req, res) => {
@@ -224,11 +179,7 @@ router.post('/planned-expenses/add', (req, res) => {
 });
 
 router.get('/planned-expenses/edit/:id', (req, res) => {
-  res.render('teamLeader/planned-expense-edit', {
-    title: 'Edit Planned Expense - FinMate',
-    user: req.user,
-    expenseId: req.params.id
-  });
+  res.redirect('/team-leader/planned-expenses');
 });
 
 router.post('/planned-expenses/edit/:id', (req, res) => {
@@ -247,25 +198,16 @@ router.post('/planned-expenses/approve/:id', (req, res) => {
 });
 
 router.get('/planned-expenses/calendar', (req, res) => {
-  res.render('teamLeader/planned-expenses-calendar', {
-    title: 'Calendar View - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/planned-expenses');
 });
 
 // Budget management routes
 router.get('/budgets/current', (req, res) => {
-  res.render('teamLeader/budgets-current', {
-    title: 'Current Budgets - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/budgets');
 });
 
 router.get('/budgets/create', (req, res) => {
-  res.render('teamLeader/budget-create', {
-    title: 'Create Budget - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/budgets');
 });
 
 router.post('/budgets/create', (req, res) => {
@@ -274,11 +216,7 @@ router.post('/budgets/create', (req, res) => {
 });
 
 router.get('/budgets/edit/:id', (req, res) => {
-  res.render('teamLeader/budget-edit', {
-    title: 'Edit Budget - FinMate',
-    user: req.user,
-    budgetId: req.params.id
-  });
+  res.redirect('/team-leader/budgets');
 });
 
 router.post('/budgets/edit/:id', (req, res) => {
@@ -292,40 +230,24 @@ router.post('/budgets/delete/:id', (req, res) => {
 });
 
 router.get('/budgets/analytics/:id', (req, res) => {
-  res.render('teamLeader/budget-analytics', {
-    title: 'Budget Analytics - FinMate',
-    user: req.user,
-    budgetId: req.params.id
-  });
+  res.redirect('/team-leader/budgets');
 });
 
 router.get('/budgets/usage', (req, res) => {
-  res.render('teamLeader/budget-usage', {
-    title: 'Budget Usage - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/budgets');
 });
 
 // Reports routes
 router.get('/reports/expenses', (req, res) => {
-  res.render('teamLeader/reports-expenses', {
-    title: 'Expense Reports - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/reports');
 });
 
 router.get('/reports/budgets', (req, res) => {
-  res.render('teamLeader/reports-budgets', {
-    title: 'Budget Reports - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/reports');
 });
 
 router.get('/reports/team-performance', (req, res) => {
-  res.render('teamLeader/reports-team-performance', {
-    title: 'Team Performance - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/reports');
 });
 
 router.get('/reports/export/:type', (req, res) => {
@@ -334,10 +256,7 @@ router.get('/reports/export/:type', (req, res) => {
 });
 
 router.get('/reports/analytics', (req, res) => {
-  res.render('teamLeader/reports-analytics', {
-    title: 'Analytics - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/reports');
 });
 
 // Notifications routes
@@ -352,10 +271,7 @@ router.post('/notifications/mark-all-read', (req, res) => {
 });
 
 router.get('/notifications/settings', (req, res) => {
-  res.render('teamLeader/notifications-settings', {
-    title: 'Notification Settings - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/dashboard');
 });
 
 router.post('/notifications/settings', (req, res) => {
@@ -365,24 +281,15 @@ router.post('/notifications/settings', (req, res) => {
 
 // Additional routes
 router.get('/settings', (req, res) => {
-  res.render('teamLeader/settings', {
-    title: 'Team Leader Settings - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/dashboard');
 });
 
 router.get('/profile', (req, res) => {
-  res.render('teamLeader/profile', {
-    title: 'Team Leader Profile - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/dashboard');
 });
 
 router.get('/quick-actions', (req, res) => {
-  res.render('teamLeader/quick-actions', {
-    title: 'Quick Actions - FinMate',
-    user: req.user
-  });
+  res.redirect('/team-leader/dashboard');
 });
 
 // API endpoints (keep as JSON for frontend)
