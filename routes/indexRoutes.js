@@ -4,7 +4,7 @@ const router = express.Router();
 // Root dashboard route - redirect to appropriate dashboard based on role
 router.get('/', (req, res) => {
   if (req.user) {
-    switch (req.user.role) {
+    switch (req.user.role_name) {
       case 'super_admin':
         return res.redirect('/super-admin/dashboard');
       case 'admin':

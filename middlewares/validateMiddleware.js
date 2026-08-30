@@ -56,8 +56,6 @@ function validateExpense(req, res, next) {
   next();
 }
 
-module.exports = { validateExpense };
-
 module.exports = {
   handleValidationErrors,
   validate,

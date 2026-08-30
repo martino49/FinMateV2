@@ -3,13 +3,11 @@ const router = express.Router();
 const incomeController = require('../controllers/incomeController');
 const { authenticate } = require('../middlewares/authMiddleware');
 
-router.use(authenticate);
-
-router.get('/', incomeController.getIncomes);
-router.get('/:id', incomeController.getIncomeById);
-router.post('/', incomeController.createIncome);
-router.put('/:id', incomeController.updateIncome);
-router.delete('/:id', incomeController.deleteIncome);
-router.get('/stats/summary', incomeController.getIncomeSummary);
+router.get('/', authenticate, incomeController.getIncomes);
+router.get('/stats/summary', authenticate, incomeController.getIncomeSummary);
+router.get('/:id', authenticate, incomeController.getIncomeById);
+router.post('/', authenticate, incomeController.createIncome);
+router.put('/:id', authenticate, incomeController.updateIncome);
+router.delete('/:id', authenticate, incomeController.deleteIncome);
 
 module.exports = router;

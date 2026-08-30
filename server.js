@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(session({
-  secret: process.env.JWT_SECRET || 'fallback-secret-key',
+  secret: process.env.SESSION_SECRET || process.env.JWT_SECRET || 'change-me-in-production',
   resave: false,
   saveUninitialized: false,
   cookie: { secure: process.env.NODE_ENV === 'production' }
@@ -48,9 +48,6 @@ app.use('/team-member', require('./routes/teamMemberRoutes'));
 app.use('/user', require('./routes/individualUserRoutes'));
 app.use('/', require('./routes/indexRoutes'));
 
-// Root route
-app.get('/', (req, res) => res.render('index', { title: 'Welcome to FinMate' }));
-
 // Health check
 app.get('/health', (req, res) => res.json({
   status: 'OK',
@@ -68,25 +65,25 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 3000;
 
 // Log environment
-console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-console.log(`🔌 DB Host: ${process.env.DB_HOST || 'localhost'}`);
+console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+console.log(`DB Host: ${process.env.DB_HOST || 'localhost'}`);
 
 // Start server
 const server = app.listen(PORT, async () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 
   // Attempt DB connection in the background
   try {
     await db.testConnection();
-    console.log('✅ Database connection test successful');
+    console.log('Database connection test successful');
 
     // Only init if explicitly requested or in non-production to avoid timeouts
     if (process.env.INIT_DB === 'true' || !process.env.NODE_ENV || process.env.NODE_ENV === 'development') {
       await db.initDatabase();
-      console.log('✅ Database initialized');
+      console.log('Database initialized');
     }
   } catch (err) {
-    console.error('⚠️ Post-startup DB check failed:', err.message);
+    console.error('Post-startup DB check failed:', err.message);
   }
 });
 
