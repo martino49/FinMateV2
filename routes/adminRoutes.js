@@ -719,14 +719,7 @@ router.get('/budgets/edit/:id', async (req, res) => {
     const [users] = await db.pool.execute('SELECT id, username FROM users WHERE is_active = 1');
     const [teams] = await db.pool.execute('SELECT id, name FROM teams');
     
-    res.render('admin/budgets/edit', {
-      title: 'Edit Budget - FinMate',
-      user: req.user,
-      budget: budgets[0],
-      users: users || [],
-      teams: teams || [],
-      error: req.query.error
-    });
+    res.redirect('/admin/budgets');
   } catch (error) {
     console.error('Edit budget form error:', error);
     res.redirect('/admin/budgets?error=Failed to load budget');
@@ -881,14 +874,7 @@ router.get('/expenses/edit/:id', async (req, res) => {
       return res.redirect('/admin/expenses?error=Expense not found');
     }
     
-    res.render('admin/expenses/edit', {
-      title: 'Edit Expense - FinMate',
-      user: req.user,
-      expense: expenses[0],
-      users: users || [],
-      teams: teams || [],
-      error: req.query.error
-    });
+    res.redirect('/admin/expenses');
   } catch (error) {
     console.error('Edit expense form error:', error);
     res.redirect('/admin/expenses?error=Failed to load expense');
@@ -983,12 +969,7 @@ router.get('/teams', async (req, res) => {
 router.get('/teams/create', async (req, res) => {
   try {
     const [users] = await db.pool.execute('SELECT id, username FROM users WHERE is_active = 1 AND role_id IN (3, 4)');
-    res.render('admin/teams/create', {
-      title: 'Create Team - FinMate',
-      user: req.user,
-      users: users || [],
-      error: req.query.error
-    });
+    res.redirect('/admin/teams');
   } catch (error) {
     console.error('Create team form error:', error);
     res.redirect('/admin/teams?error=Failed to load create team form');
@@ -1026,13 +1007,7 @@ router.get('/teams/edit/:id', async (req, res) => {
       return res.redirect('/admin/teams?error=Team not found');
     }
     
-    res.render('admin/teams/edit', {
-      title: 'Edit Team - FinMate',
-      user: req.user,
-      team: teams[0],
-      users: users || [],
-      error: req.query.error
-    });
+    res.redirect('/admin/teams');
   } catch (error) {
     console.error('Edit team form error:', error);
     res.redirect('/admin/teams?error=Failed to load team');
@@ -1076,7 +1051,7 @@ router.post('/teams/delete/:id', async (req, res) => {
 // Reports & Analytics
 router.get('/reports', async (req, res) => {
   try {
-    console.log('📊 Loading reports data...');
+    console.log('Loading reports data...');
     
     // Get financial statistics
     const [expenseStats] = await db.pool.execute(`
@@ -1185,7 +1160,7 @@ router.get('/reports', async (req, res) => {
       topUsers: topUsers || []
     };
 
-    console.log('✅ Reports data loaded successfully');
+    console.log('Reports data loaded successfully');
 
     res.render('admin/reports/list', {
       title: 'Reports & Analytics - FinMate',
@@ -1195,7 +1170,7 @@ router.get('/reports', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Reports error:', error);
+    console.error('Reports error:', error);
     
     // Fallback data
     const fallbackData = {
@@ -1337,10 +1312,7 @@ router.get('/system-settings', async (req, res) => {
   }
   
   try {
-    res.render('admin/system/settings', {
-      title: 'System Settings - FinMate',
-      user: req.user
-    });
+    res.redirect('/admin/dashboard');
   } catch (error) {
     console.error('System settings error:', error);
     res.redirect('/admin/dashboard?error=Failed to load system settings');
@@ -1355,11 +1327,7 @@ router.get('/role-management', async (req, res) => {
   
   try {
     const [roles] = await db.pool.execute('SELECT * FROM roles ORDER BY id');
-    res.render('admin/system/roles', {
-      title: 'Role Management - FinMate',
-      user: req.user,
-      roles: roles || []
-    });
+    res.redirect('/admin/dashboard');
   } catch (error) {
     console.error('Role management error:', error);
     res.redirect('/admin/dashboard?error=Failed to load role management');
@@ -1373,10 +1341,7 @@ router.get('/database', async (req, res) => {
   }
   
   try {
-    res.render('admin/system/database', {
-      title: 'Database Tools - FinMate',
-      user: req.user
-    });
+    res.redirect('/admin/dashboard');
   } catch (error) {
     console.error('Database tools error:', error);
     res.redirect('/admin/dashboard?error=Failed to load database tools');
