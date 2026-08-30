@@ -9,7 +9,7 @@ const bcrypt = require('bcrypt');
 const router = express.Router();
 
 // All routes require super admin role
-router.use(authenticate, requireRole(['super_admin']));
+router.use(authenticate, requireRole('super_admin'));
 
 // ======== SUPER ADMIN DASHBOARD ROUTES ========
 
@@ -181,9 +181,6 @@ router.get('/dashboard', async (req, res) => {
 // ======== AUDIT LOGS ROUTES ========
 
 // Audit Logs - List (FIXED VERSION)
-// ======== AUDIT LOGS ROUTES ========
-
-// Audit Logs - List (FIXED VERSION)
 router.get('/audit-logs', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
@@ -191,7 +188,7 @@ router.get('/audit-logs', async (req, res) => {
     const offset = (page - 1) * limit;
     const search = req.query.search || '';
 
-    console.log('🔍 Loading audit logs with:', { page, limit, offset, search });
+    console.log('Loading audit logs with:', { page, limit, offset, search });
 
     // Build base query without pagination first
     let baseQuery = `
@@ -223,10 +220,10 @@ router.get('/audit-logs', async (req, res) => {
     // Add ordering
     baseQuery += ` ORDER BY al.created_at DESC`;
 
-    console.log('📊 Base query:', baseQuery);
-    console.log('📊 Query params:', queryParams);
-    console.log('📊 Count query:', countQuery);
-    console.log('📊 Count params:', countParams);
+    console.log('Base query:', baseQuery);
+    console.log('Query params:', queryParams);
+    console.log('Count query:', countQuery);
+    console.log('Count params:', countParams);
 
     // Execute count query first
     let total = 0;
@@ -242,7 +239,7 @@ router.get('/audit-logs', async (req, res) => {
     let auditLogs = [];
     if (total > 0) {
       const paginatedQuery = baseQuery + ` LIMIT ${limit} OFFSET ${offset}`;
-      console.log('📊 Paginated query:', paginatedQuery);
+      console.log('Paginated query:', paginatedQuery);
       
       if (queryParams.length > 0) {
         [auditLogs] = await db.pool.execute(paginatedQuery, queryParams);
@@ -251,7 +248,7 @@ router.get('/audit-logs', async (req, res) => {
       }
     }
 
-    console.log('✅ Successfully loaded', auditLogs.length, 'audit logs out of', total);
+    console.log('Successfully loaded', auditLogs.length, 'audit logs out of', total);
 
     // Get unique actions for filter dropdown
     let actions = [];
@@ -291,7 +288,7 @@ router.get('/audit-logs', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Audit logs error:', error);
+    console.error('Audit logs error:', error);
     console.error('Error details:', error.message);
     console.error('Error code:', error.code);
     
@@ -525,7 +522,7 @@ router.get('/users', async (req, res) => {
 
     const [users] = await db.pool.execute(sql);
     
-    console.log('✅ Users fetched successfully:', users.length);
+    console.log('Users fetched successfully:', users.length);
     
     res.render('superAdmin/users/list', {
       title: 'User Management - FinMate',
@@ -1394,7 +1391,6 @@ router.post('/profile/change-password',
 
 // ======== NOTIFICATIONS ROUTES ========
 
-// Notifications - List
 // Notifications - List (FIXED VERSION)
 router.get('/notifications', async (req, res) => {
   try {
@@ -1402,7 +1398,7 @@ router.get('/notifications', async (req, res) => {
     const limit = parseInt(req.query.limit) || 20;
     const offset = (page - 1) * limit;
 
-    console.log('🔔 Loading notifications with:', { page, limit, offset });
+    console.log('Loading notifications with:', { page, limit, offset });
 
     let notifications = [];
     let total = 0;
@@ -1422,9 +1418,9 @@ router.get('/notifications', async (req, res) => {
       const [countResult] = await db.pool.execute('SELECT COUNT(*) as total FROM notifications');
       total = countResult[0].total;
       
-      console.log('✅ Successfully loaded', notifications.length, 'notifications');
+      console.log('Successfully loaded', notifications.length, 'notifications');
     } catch (dbError) {
-      console.log('❌ Notifications table not available or error:', dbError.message);
+      console.log('Notifications table not available or error:', dbError.message);
       // Continue with empty data
       notifications = [];
       total = 0;
@@ -1450,7 +1446,7 @@ router.get('/notifications', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Notifications route error:', error);
+    console.error('Notifications route error:', error);
     res.render('superAdmin/notifications/list', {
       title: 'Notifications - FinMate',
       user: req.user,
@@ -1470,222 +1466,6 @@ router.get('/notifications', async (req, res) => {
   }
 });
 
-// ======== SYSTEM SETTINGS ROUTES ========
-
-// System Settings - Simplified version
-router.get('/system-settings', async (req, res) => {
-  try {
-    // Try to get system settings, but handle case where table doesn't exist
-    let settings = [];
-    try {
-      const [settingsResult] = await db.pool.execute('SELECT * FROM system_settings ORDER BY category, name');
-      settings = settingsResult || [];
-    } catch (error) {
-      console.log('System settings table not available, using empty array');
-    }
-
-    const settingsByCategory = {};
-    settings.forEach(setting => {
-      if (!settingsByCategory[setting.category]) {
-        settingsByCategory[setting.category] = [];
-      }
-      settingsByCategory[setting.category].push(setting);
-    });
-
-    res.render('superAdmin/system/settings', {
-      title: 'System Settings - FinMate',
-      user: req.user,
-      currentPage: 'system-settings',
-      settings: settingsByCategory,
-      success: req.query.success,
-      error: req.query.error
-    });
-  } catch (error) {
-    console.error('System settings error:', error);
-    
-    // Fallback to basic settings page even if database fails
-    res.render('superAdmin/system/settings', {
-      title: 'System Settings - FinMate',
-      user: req.user,
-      currentPage: 'system-settings',
-      settings: {},
-      error: 'Failed to load system settings'
-    });
-  }
-});
-
-// Update System Settings - POST
-router.post('/system-settings/update', async (req, res) => {
-  try {
-    const settings = req.body;
-    
-    for (const [key, value] of Object.entries(settings)) {
-      await db.pool.execute(
-        'UPDATE system_settings SET value = ?, updated_at = CURRENT_TIMESTAMP WHERE name = ?',
-        [value, key]
-      );
-    }
-    
-    res.redirect('/super-admin/system-settings?success=System settings updated successfully');
-  } catch (error) {
-    console.error('Update system settings error:', error);
-    res.redirect('/super-admin/system-settings?error=Failed to update system settings');
-  }
-});
-
-// ======== SYSTEM LOGS ROUTES ========
-
-// System Logs - Simplified version
-router.get('/system-logs', async (req, res) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50;
-    const offset = (page - 1) * limit;
-    const level = req.query.level || '';
-    const search = req.query.search || '';
-
-    let systemLogs = [];
-    let total = 0;
-
-    try {
-      let baseQuery = 'FROM system_logs WHERE 1=1';
-      let countQuery = `SELECT COUNT(*) as total ${baseQuery}`;
-      let dataQuery = `SELECT * ${baseQuery}`;
-
-      const queryParams = [];
-
-      if (level) {
-        baseQuery += ' AND level = ?';
-        queryParams.push(level);
-      }
-
-      if (search) {
-        baseQuery += ' AND (message LIKE ? OR context LIKE ?)';
-        const searchTerm = `%${search}%`;
-        queryParams.push(searchTerm, searchTerm);
-      }
-
-      // Get total count
-      const [countResult] = await db.pool.execute(countQuery, queryParams);
-      total = countResult[0].total;
-
-      // Get data with pagination
-      dataQuery += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-      const dataParams = [...queryParams, limit, offset];
-      
-      const [logsResult] = await db.pool.execute(dataQuery, dataParams);
-      systemLogs = logsResult || [];
-    } catch (error) {
-      console.log('System logs table not available, using empty data');
-    }
-
-    const totalPages = Math.ceil(total / limit);
-
-    res.render('superAdmin/system/logs', {
-      title: 'System Logs - FinMate',
-      user: req.user,
-      currentPage: 'system-logs',
-      systemLogs: systemLogs,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages,
-        hasPrev: page > 1,
-        hasNext: page < totalPages
-      },
-      filters: {
-        level,
-        search
-      },
-      success: req.query.success,
-      error: req.query.error
-    });
-  } catch (error) {
-    console.error('System logs error:', error);
-    res.render('superAdmin/system/logs', {
-      title: 'System Logs - FinMate',
-      user: req.user,
-      currentPage: 'system-logs',
-      systemLogs: [],
-      pagination: {
-        page: 1,
-        limit: 50,
-        total: 0,
-        totalPages: 0,
-        hasPrev: false,
-        hasNext: false
-      },
-      filters: {},
-      error: 'Failed to load system logs'
-    });
-  }
-});
-
-// Clear System Logs
-router.post('/system-logs/clear', async (req, res) => {
-  try {
-    const { level, older_than } = req.body;
-    
-    let deleteQuery = 'DELETE FROM system_logs';
-    let queryParams = [];
-
-    if (level && level !== 'all') {
-      deleteQuery += ' WHERE level = ?';
-      queryParams.push(level);
-    }
-
-    if (older_than === '7days') {
-      deleteQuery += (level && level !== 'all' ? ' AND' : ' WHERE') + ' created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)';
-    } else if (older_than === '30days') {
-      deleteQuery += (level && level !== 'all' ? ' AND' : ' WHERE') + ' created_at < DATE_SUB(NOW(), INTERVAL 30 DAY)';
-    }
-
-    await db.pool.execute(deleteQuery, queryParams);
-    
-    res.redirect('/super-admin/system-logs?success=System logs cleared successfully');
-  } catch (error) {
-    console.error('Clear system logs error:', error);
-    res.redirect('/super-admin/system-logs?error=Failed to clear system logs');
-  }
-});
-
-// ======== BACKUP & RESTORE ROUTES ========
-
-// Backup Management
-router.get('/backups', async (req, res) => {
-  try {
-    const backups = [];
-
-    res.render('superAdmin/system/backups', {
-      title: 'Backup Management - FinMate',
-      user: req.user,
-      currentPage: 'backups',
-      backups: backups,
-      success: req.query.success,
-      error: req.query.error
-    });
-  } catch (error) {
-    console.error('Backups error:', error);
-    res.render('superAdmin/system/backups', {
-      title: 'Backup Management - FinMate',
-      user: req.user,
-      currentPage: 'backups',
-      backups: [],
-      error: 'Failed to load backups'
-    });
-  }
-});
-
-// Create Backup - POST
-router.post('/backups/create', async (req, res) => {
-  try {
-    res.redirect('/super-admin/backups?success=Backup created successfully');
-  } catch (error) {
-    console.error('Create backup error:', error);
-    res.redirect('/super-admin/backups?error=Failed to create backup');
-  }
-});
 // ======== TEST ROUTE ========
 
 // Test API route
