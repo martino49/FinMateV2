@@ -603,7 +603,22 @@ git commit -m "fix: correct column names and remove duplicate routes in individu
 **Files:**
 - Modify: `controllers/authController.js`
 
-- [ ] **Step 1: Implement updateProfile**
+- [ ] **Step 1: Fix getProfile to read query params for messages**
+
+The `updateProfile` and `changePassword` stubs redirect with `?success=...` query params, but the EJS template expects `success` and `error` as template variables. Fix `getProfile` to read from query params:
+
+```javascript
+getProfile: (req, res) => {
+  res.render('auth/profile', {
+    title: 'My Profile - FinMate',
+    user: req.user || null,
+    error: req.query.error || null,
+    success: req.query.success || null
+  });
+},
+```
+
+- [ ] **Step 2: Implement updateProfile**
 
 Replace the stub `updateProfile` with actual DB update:
 
@@ -626,7 +641,7 @@ updateProfile: async (req, res) => {
 },
 ```
 
-- [ ] **Step 2: Implement changePassword**
+- [ ] **Step 3: Implement changePassword**
 
 Replace the stub `changePassword` with actual password update:
 
@@ -654,11 +669,11 @@ changePassword: async (req, res) => {
 },
 ```
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
 git add controllers/authController.js
-git commit -m "feat: implement profile update and password change"
+git commit -m "feat: implement profile update and password change with message display"
 ```
 
 ---
