@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 
-console.log('🔍 teamMemberRoutes.js - LOADING');
+console.log('teamMemberRoutes.js - LOADING');
 
 // Apply authentication and role check
 const { authenticate, requireRole } = require('../middlewares/authMiddleware');
@@ -28,7 +28,7 @@ router.get('/dashboard', (req, res) => {
 
 // Expenses - RENDER EJS TEMPLATE (you'll need to create this view later)
 router.get('/expenses', (req, res) => {
-  res.render('teamMember/expenses', {
+  res.render('teamMember/expenses/index', {
     title: 'My Expenses - FinMate',
     user: req.user
   });
@@ -55,6 +55,6 @@ router.post('/planned-expenses/add', (req, res) => {
   res.json({ message: 'Planned Expense Added' });
 });
 
-console.log('🔍 teamMemberRoutes.js - LOADED SUCCESSFULLY');
+console.log('teamMemberRoutes.js - LOADED SUCCESSFULLY');
 
 module.exports = router;
