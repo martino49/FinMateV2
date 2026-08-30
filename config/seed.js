@@ -5,7 +5,7 @@ const { ROLES, PERMISSIONS } = require('./appConfig');
 
 const seedDatabase = async () => {
   try {
-    console.log('🌱 Starting database seeding...');
+    console.log('Starting database seeding...');
 
     // Insert roles
     const roles = [
@@ -22,7 +22,7 @@ const seedDatabase = async () => {
         [role.name, role.description]
       );
     }
-    console.log('✅ Roles seeded');
+    console.log('Roles seeded');
 
     // Insert permissions
     const permissions = Object.values(PERMISSIONS).map(permission => ({
@@ -36,7 +36,7 @@ const seedDatabase = async () => {
         [permission.name, permission.description]
       );
     }
-    console.log('✅ Permissions seeded');
+    console.log('Permissions seeded');
 
     // Get role IDs
     const [roleRows] = await db.pool.execute('SELECT id, name FROM roles');
@@ -110,7 +110,7 @@ const seedDatabase = async () => {
         );
       }
     }
-    console.log('✅ Role permissions seeded');
+    console.log('Role permissions seeded');
 
     // Create teams
     const [teamResult] = await db.pool.execute(
@@ -183,15 +183,15 @@ const seedDatabase = async () => {
 
     // Create sample savings goal
     await db.pool.execute(
-      `INSERT IGNORE INTO savings (user_id, goal_name, target_amount, current_amount, target_date) 
+      `INSERT IGNORE INTO savings_goals (user_id, name, target_amount, current_amount, target_date) 
        VALUES (?, ?, ?, ?, ?)`,
       [5, 'New Laptop', 1200.00, 300.00, '2024-06-01']
     );
 
-    console.log('✅ Sample data seeded');
+    console.log('Sample data seeded');
 
-    console.log('🎉 Database seeding completed successfully!');
-    console.log('📋 Sample login credentials:');
+    console.log('Database seeding completed successfully!');
+    console.log('Sample login credentials:');
     console.log('   Super Admin: superadmin / admin123');
     console.log('   Admin: admin / admin123');
     console.log('   Team Leader: teamlead / admin123');
@@ -199,7 +199,7 @@ const seedDatabase = async () => {
     console.log('   Individual User: user1 / admin123');
 
   } catch (error) {
-    console.error('❌ Seeding failed:', error);
+    console.error('Seeding failed:', error);
   } finally {
     process.exit();
   }
