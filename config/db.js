@@ -15,6 +15,8 @@ const dbConfig = {
   waitForConnections: true,
   connectionLimit: 5, // Reduced for serverless
   queueLimit: 0,
+  connectTimeout: 5000,
+  acquireTimeout: 5000,
   // Only use SSL if CA path is provided or if explicitly requested
   ssl: (isProduction && process.env.DB_SSL === 'true') || (process.env.DB_CA_PATH && fs.existsSync(process.env.DB_CA_PATH))
     ? {
@@ -27,8 +29,8 @@ const dbConfig = {
 };
 
 // Log which environment is active
-// console.log(`🔧 Database Configuration: ${isProduction ? 'Production (Aiven Cloud)' : 'Development (Local)'}`);
-// console.log(`📊 Database: ${dbConfig.database}`);
+// console.log(`Database Configuration: ${isProduction ? 'Production (Aiven Cloud)' : 'Development (Local)'}`);
+// console.log(`Database: ${dbConfig.database}`);
 
 const pool = mysql.createPool(dbConfig);
 
@@ -58,11 +60,11 @@ const execute = async (sql, params = []) => {
 const testConnection = async () => {
   try {
     const connection = await pool.getConnection();
-    // console.log('✅ Database connected successfully');
+    // console.log('Database connected successfully');
     connection.release();
     return true;
   } catch (error) {
-    console.error('❌ Database connection failed:', error.message);
+    console.error('Database connection failed:', error.message);
     return false;
   }
 };
@@ -70,12 +72,12 @@ const testConnection = async () => {
 // Initialize database tables
 const initDatabase = async () => {
   try {
-    // console.log('📦 Initializing database tables...');
+    // console.log('Initializing database tables...');
 
     if (!isProduction) {
       try {
         await execute(`CREATE DATABASE IF NOT EXISTS \`${dbConfig.database}\``);
-        // console.log(`✅ Database ${dbConfig.database} ready`);
+        // console.log(`Database ${dbConfig.database} ready`);
       } catch {
         console.log('ℹ️ Database already exists or creation not needed');
       }
@@ -198,6 +200,107 @@ const initDatabase = async () => {
       FOREIGN KEY (user_id) REFERENCES users(id)
     )`);
 
+    // Incomes table
+    await execute(`CREATE TABLE IF NOT EXISTS incomes (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      amount DECIMAL(10,2) NOT NULL,
+      description TEXT,
+      category VARCHAR(100),
+      source VARCHAR(100),
+      date DATE NOT NULL,
+      status ENUM('active','inactive') DEFAULT 'active',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )`);
+
+    // Planned purchases table
+    await execute(`CREATE TABLE IF NOT EXISTS planned_purchases (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      name VARCHAR(255) NOT NULL,
+      amount DECIMAL(10,2) NOT NULL,
+      description TEXT,
+      category VARCHAR(100),
+      due_date DATE,
+      status ENUM('pending','purchased','cancelled') DEFAULT 'pending',
+      priority ENUM('low','medium','high') DEFAULT 'medium',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )`);
+
+    // User settings table
+    await execute(`CREATE TABLE IF NOT EXISTS user_settings (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT UNIQUE NOT NULL,
+      currency VARCHAR(10) DEFAULT 'USD',
+      theme VARCHAR(20) DEFAULT 'light',
+      notifications_enabled BOOLEAN DEFAULT TRUE,
+      email_notifications BOOLEAN DEFAULT FALSE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )`);
+
+    // Audit logs table
+    await execute(`CREATE TABLE IF NOT EXISTS audit_logs (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT,
+      action VARCHAR(100) NOT NULL,
+      entity_type VARCHAR(50),
+      entity_id INT,
+      old_values JSON,
+      new_values JSON,
+      ip_address VARCHAR(45),
+      user_agent TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )`);
+
+    // System logs table
+    await execute(`CREATE TABLE IF NOT EXISTS system_logs (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      level ENUM('info','warn','error','debug') DEFAULT 'info',
+      message TEXT NOT NULL,
+      source VARCHAR(100),
+      metadata JSON,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`);
+
+    // System settings table
+    await execute(`CREATE TABLE IF NOT EXISTS system_settings (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      setting_key VARCHAR(100) UNIQUE NOT NULL,
+      setting_value TEXT,
+      description TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )`);
+
+    // === Add Missing Columns to Existing Tables ===
+    // Add status and team_id to expenses if missing
+    try {
+      await execute(`ALTER TABLE expenses ADD COLUMN status ENUM('pending','approved','rejected') DEFAULT 'pending' AFTER date`);
+    } catch { /* column exists */ }
+    try {
+      await execute(`ALTER TABLE expenses ADD COLUMN team_id INT NULL AFTER user_id`);
+    } catch { /* column exists */ }
+
+    // Add planned_date and recurrence to planned_expenses if missing
+    try {
+      await execute(`ALTER TABLE planned_expenses ADD COLUMN planned_date DATE AFTER due_date`);
+    } catch { /* column exists */ }
+    try {
+      await execute(`ALTER TABLE planned_expenses ADD COLUMN recurrence ENUM('none','weekly','monthly','yearly') DEFAULT 'none' AFTER status`);
+    } catch { /* column exists */ }
+
+    // Add team_id to budgets if missing
+    try {
+      await execute(`ALTER TABLE budgets ADD COLUMN team_id INT NULL AFTER user_id`);
+    } catch { /* column exists */ }
+
     // === Default Data Section ===
     await execute(`INSERT IGNORE INTO roles (id,name,description) VALUES
       (1,'super_admin','Full system access'),
@@ -222,10 +325,10 @@ const initDatabase = async () => {
       (4,4),(4,5),(4,6),
       (5,3),(5,4),(5,5),(5,6)`);
 
-    // console.log('✅ Database tables initialized successfully');
+    // console.log('Database tables initialized successfully');
 
   } catch (error) {
-    console.error('❌ Error initializing database:', error.message);
+    console.error('Error initializing database:', error.message);
     throw error;
   }
 };
