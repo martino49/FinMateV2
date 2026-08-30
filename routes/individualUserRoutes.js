@@ -4,9 +4,6 @@ const { safeQuery } = require('../utils/dbHelper');
 const { validateExpense } = require('../middlewares/validateMiddleware');
 const asyncHandler = require('../middlewares/asyncHandler');
 
-const incomeRoutes = require('../routes/income');
-const plannedPurchaseRoutes = require('../routes/plannedPurchases');
-
 const router = express.Router();
 
 // Helper functions for MySQL2 result handling
@@ -194,7 +191,7 @@ const getDashboardData = async (userId, role = 'individual_user') => {
     return result;
     
   } catch (error) {
-    console.error('❌ getDashboardData error:', error);
+    console.error('getDashboardData error:', error);
     throw error;
   }
 };
@@ -227,7 +224,7 @@ router.get('/dashboard', asyncHandler(async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Dashboard error:', error);
+        console.error('Dashboard error:', error);
         
         // Fallback data in case of error
         const fallbackData = {
@@ -327,7 +324,7 @@ router.get('/savings', asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Savings route error:', error);
+    console.error('Savings route error:', error);
     
     res.render('individualUser/savings/list', {
       title: 'My Savings Goals',
@@ -365,7 +362,7 @@ router.get('/savings/add', asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Add savings page error:', error);
+    console.error('Add savings page error:', error);
     res.redirect('/user/savings?error=Failed to load add savings page');
   }
 }));
@@ -398,7 +395,7 @@ router.post('/savings/add', asyncHandler(async (req, res) => {
     }
     
   } catch (error) {
-    console.error('❌ Add savings error:', error);
+    console.error('Add savings error:', error);
     
     let errorMessage = 'Failed to create savings goal';
     if (error.code === 'ER_DUP_ENTRY') {
@@ -473,7 +470,7 @@ router.post('/savings/add-amount/:id', asyncHandler(async (req, res) => {
     }
     
   } catch (error) {
-    console.error('❌ Add amount error:', error);
+    console.error('Add amount error:', error);
     res.redirect('/user/savings?error=Failed to add amount to savings goal');
   }
 }));
@@ -516,7 +513,7 @@ router.get('/savings/edit/:id', asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Edit savings error:', error);
+    console.error('Edit savings error:', error);
     res.redirect('/user/savings?error=Failed to load savings goal');
   }
 }));
@@ -545,7 +542,7 @@ router.post('/savings/edit/:id', asyncHandler(async (req, res) => {
     }
     
   } catch (error) {
-    console.error('❌ Update savings error:', error);
+    console.error('Update savings error:', error);
     res.redirect(`/user/savings/edit/${savingsId}?error=Failed to update savings goal: ${error.message}`);
   }
 }));
@@ -570,7 +567,7 @@ router.post('/savings/delete/:id', asyncHandler(async (req, res) => {
     throw new Error('Savings goal not deleted');
     
   } catch (error) {
-    console.error('❌ Delete savings error:', error);
+    console.error('Delete savings error:', error);
     res.redirect('/user/savings?error=Failed to delete savings goal');
   }
 }));
@@ -660,7 +657,7 @@ router.get('/incomes', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Incomes route error:', error);
+    console.error('Incomes route error:', error);
     
     // Fallback data in case of error
     res.render('individualUser/incomes/list', {
@@ -709,7 +706,7 @@ router.get('/incomes/add', async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Add income page error:', error);
+        console.error('Add income page error:', error);
         res.redirect('/user/incomes?error=Failed to load add income page');
     }
 });
@@ -744,7 +741,7 @@ router.post('/incomes/add', asyncHandler(async (req, res) => {
         }
         
     } catch (error) {
-        console.error('❌ Add income error:', error);
+        console.error('Add income error:', error);
         
         let errorMessage = 'Failed to add income';
         if (error.code === 'ER_DUP_ENTRY') {
@@ -803,7 +800,7 @@ router.get('/incomes/edit/:id', asyncHandler(async (req, res) => {
         });
 
     } catch (error) {
-        console.error('❌ Edit income error:', error);
+        console.error('Edit income error:', error);
         res.redirect('/user/incomes?error=Failed to load income');
     }
 }));
@@ -842,7 +839,7 @@ router.post('/incomes/edit/:id', asyncHandler(async (req, res) => {
         }
         
     } catch (error) {
-        console.error('❌ Update income error:', error);
+        console.error('Update income error:', error);
         res.redirect(`/user/incomes/edit/${incomeId}?error=Failed to update income: ${error.message}`);
     }
 }));
@@ -867,7 +864,7 @@ router.post('/incomes/delete/:id', asyncHandler(async (req, res) => {
         throw new Error('Income not deleted');
         
     } catch (error) {
-        console.error('❌ Delete income error:', error);
+        console.error('Delete income error:', error);
         res.redirect('/user/incomes?error=Failed to delete income');
     }
 }));
@@ -1010,7 +1007,7 @@ router.get('/expenses/edit/:id', asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Edit expense error:', error);
+    console.error('Edit expense error:', error);
     res.redirect('/user/expenses?error=Failed to load expense');
   }
 }));
@@ -1038,7 +1035,7 @@ router.post('/expenses/edit/:id', validateExpense, asyncHandler(async (req, res)
     }
     
   } catch (error) {
-    console.error('❌ Update expense error:', error);
+    console.error('Update expense error:', error);
     res.redirect(`/user/expenses/edit/${expenseId}?error=Failed to update expense: ${error.message}`);
   }
 }));
@@ -1063,7 +1060,7 @@ router.post('/expenses/delete/:id', asyncHandler(async (req, res) => {
     throw new Error('Expense not deleted');
     
   } catch (error) {
-    console.error('❌ Delete expense error:', error);
+    console.error('Delete expense error:', error);
     res.redirect('/user/expenses?error=Failed to delete expense');
   }
 }));
@@ -1124,7 +1121,7 @@ router.get('/budgets', asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Budgets route error:', error);
+    console.error('Budgets route error:', error);
     
     const budgets = await safeQuery(
       `SELECT 
@@ -1217,7 +1214,7 @@ router.post('/budgets/add', asyncHandler(async (req, res) => {
     }
     
   } catch (error) {
-    console.error('❌ Add budget error:', error);
+    console.error('Add budget error:', error);
     
     let errorMessage = 'Failed to add budget';
     if (error.code === 'ER_DUP_ENTRY') {
@@ -1271,7 +1268,7 @@ router.post('/budgets/update/:id', asyncHandler(async (req, res) => {
     res.redirect(`/user/budgets/edit/${budgetId}?success=true&message=Budget updated successfully`);
 
   } catch (error) {
-    console.error('❌ Update budget error:', error);
+    console.error('Update budget error:', error);
     res.redirect(`/user/budgets/edit/${budgetId}?error=Failed to update budget`);
   }
 }));
@@ -1311,7 +1308,7 @@ router.post('/budgets/edit/:id', asyncHandler(async (req, res) => {
     }
     
   } catch (error) {
-    console.error('❌ Update budget error:', error);
+    console.error('Update budget error:', error);
     res.redirect(`/user/budgets/edit/${budgetId}?error=Failed to update budget: ${error.message}`);
   }
 }));
@@ -1336,7 +1333,7 @@ router.post('/budgets/delete/:id', asyncHandler(async (req, res) => {
     throw new Error('Budget not deleted');
     
   } catch (error) {
-    console.error('❌ Delete budget error:', error);
+    console.error('Delete budget error:', error);
     res.redirect('/user/budgets?error=Failed to delete budget');
   }
 }));
@@ -1422,7 +1419,7 @@ router.post('/planned-expenses/add', asyncHandler(async (req, res) => {
     }
     
   } catch (error) {
-    console.error('❌ Add planned expense error:', error);
+    console.error('Add planned expense error:', error);
     
     let errorMessage = 'Failed to add planned expense';
     if (error.code === 'ER_DUP_ENTRY') {
@@ -1516,7 +1513,7 @@ router.get('/upcoming-expenses', asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Upcoming expenses route error:', error);
+    console.error('Upcoming expenses route error:', error);
     
     // Fallback data in case of error
     res.render('individualUser/upcoming-expenses/list', {
@@ -1560,7 +1557,7 @@ router.get('/upcoming-expenses/add', asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Add upcoming expense page error:', error);
+    console.error('Add upcoming expense page error:', error);
     res.redirect('/user/upcoming-expenses?error=Failed to load add expense page');
   }
 }));
@@ -1596,7 +1593,7 @@ router.post('/upcoming-expenses/add', asyncHandler(async (req, res) => {
     }
     
   } catch (error) {
-    console.error('❌ Add upcoming expense error:', error);
+    console.error('Add upcoming expense error:', error);
     
     let errorMessage = 'Failed to add upcoming expense';
     if (error.code === 'ER_DUP_ENTRY') {
@@ -1655,7 +1652,7 @@ router.get('/upcoming-expenses/edit/:id', asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Edit purchase route error:', error);
+    console.error('Edit purchase route error:', error);
     res.redirect('/user/upcoming-expenses?error=Unable to load expense for editing');
   }
 }));
@@ -1693,7 +1690,7 @@ router.post('/upcoming-expenses/edit/:id', asyncHandler(async (req, res) => {
     }
     
   } catch (error) {
-    console.error('❌ Update upcoming expense error:', error);
+    console.error('Update upcoming expense error:', error);
     res.redirect(`/user/upcoming-expenses/edit/${expenseId}?error=Failed to update upcoming expense: ${error.message}`);
   }
 }));
@@ -1718,7 +1715,7 @@ router.post('/upcoming-expenses/delete/:id', asyncHandler(async (req, res) => {
     throw new Error('Upcoming expense not deleted');
     
   } catch (error) {
-    console.error('❌ Delete upcoming expense error:', error);
+    console.error('Delete upcoming expense error:', error);
     res.redirect('/user/upcoming-expenses?error=Failed to delete upcoming expense');
   }
 }));
@@ -1743,7 +1740,7 @@ router.post('/upcoming-expenses/complete/:id', asyncHandler(async (req, res) => 
     throw new Error('Upcoming expense not found');
     
   } catch (error) {
-    console.error('❌ Complete upcoming expense error:', error);
+    console.error('Complete upcoming expense error:', error);
     res.redirect('/user/upcoming-expenses?error=Failed to mark expense as completed');
   }
 }));
@@ -1782,7 +1779,7 @@ router.get('/settings', asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Settings error:', error);
+    console.error('Settings error:', error);
     res.redirect('/user/dashboard?error=Failed to load settings');
   }
 }));
@@ -1810,7 +1807,7 @@ router.post('/settings/update', asyncHandler(async (req, res) => {
     res.redirect('/user/settings?success=true&message=Settings updated successfully');
 
   } catch (error) {
-    console.error('❌ Update settings error:', error);
+    console.error('Update settings error:', error);
     res.redirect('/user/settings?error=Failed to update settings');
   }
 }));
@@ -1859,7 +1856,7 @@ router.get('/notifications', asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Error in notifications route:', error);
+    console.error('Error in notifications route:', error);
     // FIXED: Using the correct view path
     res.render('individualUser/notifications/list', {
       title: 'Notifications',
@@ -1959,7 +1956,7 @@ const getFinancialAnalyticsData = async (userId, period = 'month', category = 'a
     };
 
   } catch (error) {
-    console.error('❌ getFinancialAnalyticsData error:', error);
+    console.error('getFinancialAnalyticsData error:', error);
     // Return empty data structure instead of throwing
     return {
       expenseTrends: [],
@@ -2026,7 +2023,7 @@ const getExpenseTrends = async (userId, dateRange) => {
       [userId, dateRange.start, dateRange.end]
     );
 
-    console.log('📈 Expense trends data:', trends); // Debug log
+    console.log('Expense trends data:', trends); // Debug log
 
     // Use your existing helper function
     const result = handleMySQL2Result(trends);
@@ -2036,7 +2033,7 @@ const getExpenseTrends = async (userId, dateRange) => {
       count: parseInt(item.transaction_count) || 0
     }));
   } catch (error) {
-    console.error('❌ getExpenseTrends error:', error);
+    console.error('getExpenseTrends error:', error);
     return [];
   }
 };
@@ -2070,7 +2067,7 @@ const getCategoryBreakdown = async (userId, dateRange) => {
       [userId, dateRange.start, dateRange.end]
     );
 
-    console.log('🥧 Category breakdown data:', breakdown); // Debug log
+    console.log('Category breakdown data:', breakdown); // Debug log
 
     const result = handleMySQL2Result(breakdown);
     return result.map(item => ({
@@ -2080,7 +2077,7 @@ const getCategoryBreakdown = async (userId, dateRange) => {
       percentage: totalExpenses > 0 ? (parseFloat(item.total_amount) / totalExpenses) * 100 : 0
     }));
   } catch (error) {
-    console.error('❌ getCategoryBreakdown error:', error);
+    console.error('getCategoryBreakdown error:', error);
     return [];
   }
 };
@@ -2145,7 +2142,7 @@ const getIncomeVsExpense = async (userId, dateRange) => {
 
     return Object.values(monthlyData);
   } catch (error) {
-    console.error('❌ getIncomeVsExpense error:', error);
+    console.error('getIncomeVsExpense error:', error);
     return [];
   }
 };
@@ -2169,7 +2166,7 @@ const getMonthlyComparison = async (userId) => {
       [userId]
     );
 
-    console.log('📊 Monthly comparison data:', comparison); // Debug log
+    console.log('Monthly comparison data:', comparison); // Debug log
 
     const result = handleMySQL2Result(comparison);
     return result.map(item => ({
@@ -2178,7 +2175,7 @@ const getMonthlyComparison = async (userId) => {
       count: parseInt(item.transaction_count) || 0
     }));
   } catch (error) {
-    console.error('❌ getMonthlyComparison error:', error);
+    console.error('getMonthlyComparison error:', error);
     return [];
   }
 };
@@ -2207,7 +2204,7 @@ const getBudgetProgress = async (userId) => {
       [userId]
     );
 
-    console.log('🎯 Budget progress data:', progress); // Debug log
+    console.log('Budget progress data:', progress); // Debug log
 
     const result = handleMySQL2Result(progress);
     return result.map(item => ({
@@ -2219,7 +2216,7 @@ const getBudgetProgress = async (userId) => {
       remaining: (parseFloat(item.budget_amount) || 0) - (parseFloat(item.spent_amount) || 0)
     }));
   } catch (error) {
-    console.error('❌ getBudgetProgress error:', error);
+    console.error('getBudgetProgress error:', error);
     return [];
   }
 };
@@ -2231,7 +2228,7 @@ router.get('/analytics', asyncHandler(async (req, res) => {
     const { period = 'month', category = 'all', start_date, end_date } = req.query;
     const db = require('../config/db');
 
-    console.log('🔍 Analytics request for user:', userId, 'period:', period); // Debug log
+    console.log('Analytics request for user:', userId, 'period:', period); // Debug log
 
     // Get notification count
     const notificationCount = await getNotificationCount(userId);
@@ -2239,7 +2236,7 @@ router.get('/analytics', asyncHandler(async (req, res) => {
     // Get financial data for charts
     const financialData = await getFinancialAnalyticsData(userId, period, category, start_date, end_date);
 
-    console.log('📊 Final financial data structure:', { // Debug log
+    console.log('Final financial data structure:', { // Debug log
       expenseTrendsCount: financialData.expenseTrends.length,
       categoryBreakdownCount: financialData.categoryBreakdown.length,
       incomeVsExpenseCount: financialData.incomeVsExpense.length,
@@ -2262,7 +2259,7 @@ router.get('/analytics', asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Analytics route error:', error);
+    console.error('Analytics route error:', error);
     
     // Fallback data
     const fallbackData = {
@@ -2309,7 +2306,7 @@ router.get('/analytics/categories', asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Category analytics error:', error);
+    console.error('Category analytics error:', error);
     res.redirect('/user/analytics?error=Failed to load category analytics');
   }
 }));
@@ -2357,7 +2354,7 @@ router.get('/analytics/trends', asyncHandler(async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Trends analytics error:', error);
+    console.error('Trends analytics error:', error);
     res.redirect('/user/analytics?error=Failed to load trend data');
   }
 }));
@@ -2428,7 +2425,7 @@ router.post('/api/analytics/trends', asyncHandler(async (req, res) => {
     const userId = req.user.id;
     const { startDate, endDate } = req.body;
     
-    console.log('📈 API Trends request:', { userId, startDate, endDate }); // Debug log
+    console.log('API Trends request:', { userId, startDate, endDate }); // Debug log
 
     // Validate date range
     if (!startDate || !endDate) {
@@ -2452,7 +2449,7 @@ router.post('/api/analytics/trends', asyncHandler(async (req, res) => {
     // Process data for the chart
     const chartData = processChartData(expenseTrends, incomeTrends, dateRange);
 
-    console.log('📊 API Response data:', { // Debug log
+    console.log('API Response data:', { // Debug log
       labelsCount: chartData.labels.length,
       incomeDataCount: chartData.income.length,
       expenseDataCount: chartData.expenses.length
@@ -2461,7 +2458,7 @@ router.post('/api/analytics/trends', asyncHandler(async (req, res) => {
     res.json(chartData);
 
   } catch (error) {
-    console.error('❌ API Trends error:', error);
+    console.error('API Trends error:', error);
     res.status(500).json({ 
       error: 'Failed to fetch trends data',
       details: error.message 
@@ -2488,7 +2485,7 @@ const getIncomeTrends = async (userId, dateRange) => {
       [userId, dateRange.start, dateRange.end]
     );
 
-    console.log('💰 Income trends raw data:', incomes); // Debug log
+    console.log('Income trends raw data:', incomes); // Debug log
 
     const result = handleMySQL2Result(incomes);
     return result.map(item => ({
@@ -2497,7 +2494,7 @@ const getIncomeTrends = async (userId, dateRange) => {
       count: parseInt(item.transaction_count) || 0
     }));
   } catch (error) {
-    console.error('❌ getIncomeTrends error:', error);
+    console.error('getIncomeTrends error:', error);
     return [];
   }
 };
@@ -2548,7 +2545,7 @@ const processChartData = (expenseTrends, incomeTrends, dateRange) => {
   const expenseData = sortedDates.map(item => item.expenses);
   const savingsData = sortedDates.map(item => item.income - item.expenses);
 
-  console.log('📈 Processed chart data:', { // Debug log
+  console.log('Processed chart data:', { // Debug log
     totalDays: labels.length,
     totalIncome: incomeData.reduce((a, b) => a + b, 0),
     totalExpenses: expenseData.reduce((a, b) => a + b, 0),
@@ -2562,10 +2559,5 @@ const processChartData = (expenseTrends, incomeTrends, dateRange) => {
     savings: savingsData
   };
 };
-
-// ======== MOUNT IMPORTED ROUTES ========
-// These will handle /user/incomes/* and /user/planned-purchases/* routes
-router.use('/incomes', incomeRoutes);
-router.use('/planned-purchases', plannedPurchaseRoutes);
 
 module.exports = router;
