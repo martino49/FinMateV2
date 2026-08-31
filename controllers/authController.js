@@ -40,7 +40,7 @@ const authController = {
         console.error('Database query error:', dbError);
         return res.render('auth/login', {
           title: 'Login - FinMate',
-          error: 'Database connection error',
+          error: 'Something went wrong. Please try again in a moment.',
           user: null
         });
       }
@@ -80,7 +80,7 @@ const authController = {
         console.error('Password comparison error:', pwdError);
         return res.render('auth/login', {
           title: 'Login - FinMate',
-          error: 'Password verification failed',
+          error: 'Something went wrong. Please try again.',
           user: null
         });
       }
@@ -153,7 +153,7 @@ const authController = {
       console.error('Error stack:', error.stack);
       return res.render('auth/login', {
         title: 'Login - FinMate',
-        error: 'An error occurred during login',
+        error: 'Something unexpected happened. Please try again.',
         user: null
       });
     }
@@ -223,7 +223,7 @@ const authController = {
         console.error('Database check error:', dbError);
         return res.render('auth/register', {
           title: 'Register - FinMate',
-          error: 'Database connection error',
+          error: 'Something went wrong. Please try again in a moment.',
           user: null
         });
       }
@@ -232,7 +232,7 @@ const authController = {
         console.log('User already exists with email or username:', email, username);
         return res.render('auth/register', {
           title: 'Register - FinMate',
-          error: 'User with this email or username already exists',
+          error: 'An account with that email or username already exists',
           user: null
         });
       }
@@ -249,7 +249,7 @@ const authController = {
         console.error('Role query error:', roleError);
         return res.render('auth/register', {
           title: 'Register - FinMate',
-          error: 'System configuration error',
+          error: 'Unable to complete registration right now. Please try again later.',
           user: null
         });
       }
@@ -258,7 +258,7 @@ const authController = {
         console.error('Individual user role not found in database');
         return res.render('auth/register', {
           title: 'Register - FinMate',
-          error: 'System configuration error - role not found',
+          error: 'Unable to complete registration right now. Please try again later.',
           user: null
         });
       }
@@ -281,7 +281,7 @@ const authController = {
         console.error('User creation error:', createError);
         return res.render('auth/register', {
           title: 'Register - FinMate',
-          error: 'Failed to create user account: ' + createError.message,
+          error: 'Could not create your account. Please try again.',
           user: null
         });
       }
@@ -297,7 +297,7 @@ const authController = {
       console.error('Error stack:', error.stack);
       return res.render('auth/register', {
         title: 'Register - FinMate',
-        error: 'An unexpected error occurred during registration',
+        error: 'Something unexpected happened. Please try again.',
         user: null
       });
     }

@@ -2320,21 +2320,24 @@ router.get('/analytics/trends', asyncHandler(async (req, res) => {
 
     const notificationCount = await getNotificationCount(userId);
     
-    // Get trend data
-    const table = type === 'income' ? 'incomes' : 'expenses';
-    const dateField = type === 'income' ? 'received_date' : 'date';
+    // Get trend data - explicit allowlist for table/column names (not parameterizable)
+    const TRENDS_CONFIG = {
+      income: { table: 'incomes', dateField: 'received_date' },
+      expenses: { table: 'expenses', dateField: 'date' },
+    };
+    const config = TRENDS_CONFIG[type] || TRENDS_CONFIG.expenses;
     
     const trends = await db.execute(
       `SELECT 
-        DATE_FORMAT(${dateField}, '%Y-%m') as month,
+        DATE_FORMAT(${config.dateField}, '%Y-%m') as month,
         SUM(amount) as total_amount,
         COUNT(*) as transaction_count
-       FROM ${table} 
+       FROM ${config.table} 
        WHERE user_id = ? 
-         AND ${dateField} >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
-       GROUP BY DATE_FORMAT(${dateField}, '%Y-%m')
+         AND ${config.dateField} >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
+       GROUP BY DATE_FORMAT(${config.dateField}, '%Y-%m')
        ORDER BY month ASC`,
-      [userId, parseInt(months)]
+      [userId, parseInt(months) || 6]
     );
 
     const trendData = handleMySQL2Result(trends).map(item => ({

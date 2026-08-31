@@ -1,113 +1,563 @@
 <%
-    // Normalize parameters - views use either currentPage or activePage
     var activePage = (typeof currentPage !== 'undefined' && currentPage) ? currentPage : (typeof activePage !== 'undefined' ? activePage : '');
     var userName = (typeof user !== 'undefined' && user) ? (user.first_name || user.username || user.email) : '';
+    var userRole = (typeof user !== 'undefined' && user) ? (user.role_name || user.role || 'individual_user') : 'individual_user';
     var notifCount = (typeof notificationCount !== 'undefined') ? notificationCount : 0;
+
+    var menus = {
+        super_admin: [
+            { section: 'Platform' },
+            { label: 'Dashboard', icon: 'fa-tachometer-alt', href: '/super-admin/dashboard', page: 'dashboard' },
+            { label: 'Users', icon: 'fa-users', href: '/super-admin/users', page: 'users' },
+            { label: 'Roles', icon: 'fa-user-shield', href: '/super-admin/roles', page: 'roles' },
+            { label: 'Permissions', icon: 'fa-key', href: '/super-admin/permissions', page: 'permissions' },
+            { label: 'Audit Logs', icon: 'fa-clipboard-list', href: '/super-admin/audit-logs', page: 'audit-logs' },
+            { label: 'Notifications', icon: 'fa-bell', href: '/super-admin/notifications', page: 'notifications' },
+            { label: 'System Settings', icon: 'fa-cogs', href: '/super-admin/system-settings', page: 'settings' },
+            { section: 'Account' },
+            { label: 'Profile', icon: 'fa-user-circle', href: '/super-admin/profile', page: 'profile' }
+        ],
+        admin: [
+            { section: 'Management' },
+            { label: 'Dashboard', icon: 'fa-tachometer-alt', href: '/admin/dashboard', page: 'dashboard' },
+            { label: 'Users', icon: 'fa-users', href: '/admin/users', page: 'users' },
+            { label: 'Budgets', icon: 'fa-wallet', href: '/admin/budgets', page: 'budgets' },
+            { label: 'Expenses', icon: 'fa-money-bill-wave', href: '/admin/expenses', page: 'expenses' },
+            { label: 'Teams', icon: 'fa-sitemap', href: '/admin/teams', page: 'teams' },
+            { label: 'Reports', icon: 'fa-chart-bar', href: '/admin/reports', page: 'reports' },
+            { label: 'Notifications', icon: 'fa-bell', href: '/admin/notifications', page: 'notifications' },
+            { section: 'Account' },
+            { label: 'Profile', icon: 'fa-user-circle', href: '/admin/profile', page: 'profile' }
+        ],
+        team_leader: [
+            { section: 'Team' },
+            { label: 'Dashboard', icon: 'fa-tachometer-alt', href: '/team-leader/dashboard', page: 'dashboard' },
+            { label: 'My Team', icon: 'fa-users', href: '/team-leader/teams', page: 'teams' },
+            { label: 'Expenses', icon: 'fa-receipt', href: '/team-leader/expenses', page: 'expenses' },
+            { label: 'Planned Expenses', icon: 'fa-calendar-check', href: '/team-leader/planned-expenses', page: 'planned-expenses' },
+            { section: 'Account' }
+        ],
+        team_member: [
+            { section: 'Work' },
+            { label: 'Dashboard', icon: 'fa-tachometer-alt', href: '/team-member/dashboard', page: 'dashboard' },
+            { label: 'Expenses', icon: 'fa-receipt', href: '/team-member/expenses', page: 'expenses' },
+            { label: 'Planned Expenses', icon: 'fa-calendar-check', href: '/team-member/planned-expenses', page: 'planned-expenses' },
+            { section: 'Account' }
+        ],
+        individual_user: [
+            { section: 'Finance' },
+            { label: 'Dashboard', icon: 'fa-tachometer-alt', href: '/user/dashboard', page: 'dashboard' },
+            { label: 'Expenses', icon: 'fa-receipt', href: '/user/expenses', page: 'expenses' },
+            { label: 'Incomes', icon: 'fa-money-bill-wave', href: '/user/incomes', page: 'incomes' },
+            { label: 'Budgets', icon: 'fa-wallet', href: '/user/budgets', page: 'budgets' },
+            { label: 'Savings Goals', icon: 'fa-piggy-bank', href: '/user/savings', page: 'savings' },
+            { label: 'Planned Expenses', icon: 'fa-calendar-check', href: '/user/planned-expenses', page: 'planned-expenses' },
+            { label: 'Upcoming Expenses', icon: 'fa-clock', href: '/user/upcoming-expenses', page: 'upcoming-expenses' },
+            { label: 'Analytics', icon: 'fa-chart-bar', href: '/user/analytics', page: 'analytics' },
+            { label: 'Notifications', icon: 'fa-bell', href: '/user/notifications', page: 'notifications', badge: notifCount },
+            { section: 'Account' },
+            { label: 'Settings', icon: 'fa-cog', href: '/user/settings', page: 'settings' },
+            { label: 'Profile', icon: 'fa-user', href: '/user/profile', page: 'profile' }
+        ]
+    };
+
+    var logoutPaths = {
+        super_admin: '/auth/logout',
+        admin: '/auth/logout',
+        team_leader: '/auth/logout',
+        team_member: '/auth/logout',
+        individual_user: '/auth/logout'
+    };
+
+    var menu = menus[userRole] || menus.individual_user;
+    var logoutPath = logoutPaths[userRole] || '/auth/logout';
 %>
+
 <style>
-    .sidebar {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    /* ===== SIDEBAR ===== */
+    .fm-sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 260px;
+        height: 100vh;
+        background: linear-gradient(180deg, #1e3a5f 0%, #0f2744 100%);
+        z-index: 1040;
+        display: flex;
+        flex-direction: column;
+        transition: width 0.3s ease, transform 0.3s ease;
+        overflow: hidden;
     }
-    .sidebar .nav-link {
-        color: #fff;
-        padding: 12px 20px;
-        margin: 4px 0;
-        border-radius: 8px;
-        transition: all 0.3s;
+
+    .fm-sidebar.collapsed {
+        width: 70px;
     }
-    .sidebar .nav-link:hover {
-        background: rgba(255,255,255,0.1);
-        transform: translateX(5px);
+
+    .fm-sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 1.25rem 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        flex-shrink: 0;
+        min-height: 64px;
     }
-    .sidebar .nav-link.active {
-        background: rgba(255,255,255,0.2);
-        font-weight: bold;
+
+    .fm-sidebar-brand-icon {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        background: linear-gradient(135deg, #0d9488, #14b8a6);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(13, 148, 136, 0.3);
     }
-    .sidebar-brand {
-        color: #fff;
-        font-size: 1.25rem;
+
+    .fm-sidebar-brand-icon i {
+        font-size: 1.1rem;
+        color: white;
+    }
+
+    .fm-sidebar-brand-text {
+        font-size: 1.2rem;
         font-weight: 700;
-        padding: 1.5rem 1rem;
+        color: #0d9488;
+        white-space: nowrap;
+        overflow: hidden;
+        transition: opacity 0.2s;
+    }
+
+    .fm-sidebar.collapsed .fm-sidebar-brand-text,
+    .fm-sidebar.collapsed .fm-sidebar-user,
+    .fm-sidebar.collapsed .fm-sidebar-section,
+    .fm-sidebar.collapsed .fm-nav-label,
+    .fm-sidebar.collapsed .fm-nav-badge {
+        opacity: 0;
+        width: 0;
+        overflow: hidden;
+    }
+
+    .fm-sidebar-user {
         text-align: center;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.08);
+        flex-shrink: 0;
+    }
+
+    .fm-sidebar-user small {
+        color: rgba(255,255,255,0.5);
+        font-size: 0.8rem;
+    }
+
+    .fm-sidebar-nav {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 0.5rem 0;
+    }
+
+    .fm-sidebar-nav::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .fm-sidebar-nav::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.15);
+        border-radius: 2px;
+    }
+
+    .fm-sidebar-section {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: rgba(255,255,255,0.35);
+        padding: 0.75rem 1.25rem 0.3rem;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: opacity 0.2s;
+    }
+
+    .fm-sidebar-nav .fm-nav-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: rgba(255,255,255,0.75);
+        padding: 10px 16px;
+        margin: 2px 8px;
+        border-radius: 8px;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .fm-sidebar-nav .fm-nav-link:hover {
+        background: rgba(255,255,255,0.08);
+        color: #fff;
+    }
+
+    .fm-sidebar-nav .fm-nav-link.active {
+        background: rgba(13, 148, 136, 0.25);
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .fm-sidebar-nav .fm-nav-link i {
+        font-size: 1rem;
+        width: 20px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .fm-nav-label {
+        transition: opacity 0.2s;
+        white-space: nowrap;
+    }
+
+    .fm-nav-badge {
+        margin-left: auto;
+        transition: opacity 0.2s;
+    }
+
+    .fm-sidebar-footer {
+        flex-shrink: 0;
+        border-top: 1px solid rgba(255,255,255,0.08);
+        padding: 0.5rem 0;
+    }
+
+    /* ===== TOGGLE BUTTON ===== */
+    .fm-sidebar-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        color: rgba(255,255,255,0.5);
+        padding: 10px 16px;
+        margin: 4px 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        background: none;
+        width: calc(100% - 16px);
+        text-align: left;
+        font-size: 0.85rem;
+    }
+
+    .fm-sidebar-toggle:hover {
+        background: rgba(255,255,255,0.08);
+        color: #fff;
+    }
+
+    .fm-sidebar-toggle i {
+        font-size: 0.85rem;
+        transition: transform 0.3s;
+    }
+
+    .fm-sidebar.collapsed .fm-sidebar-toggle i.fa-angles-left {
+        transform: rotate(180deg);
+    }
+
+    .fm-sidebar.collapsed .fm-sidebar-toggle span {
+        opacity: 0;
+        width: 0;
+        overflow: hidden;
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    .fm-main {
+        margin-left: 260px;
+        min-height: 100vh;
+        transition: margin-left 0.3s ease;
+        padding: 0 1.5rem 2rem;
+        background: #f8f9fc;
+    }
+
+    .fm-main.sidebar-collapsed {
+        margin-left: 70px;
+    }
+
+    /* ===== TOP BAR (mobile + desktop) ===== */
+    .fm-topbar {
+        background: #fff;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 0.65rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+        margin: 0 -1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .fm-topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .fm-topbar-brand {
+        display: none;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .fm-topbar-brand-icon {
+        width: 28px;
+        height: 28px;
+        background: linear-gradient(135deg, #0d9488, #14b8a6);
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .fm-topbar-brand-icon i {
+        font-size: 0.8rem;
+        color: white;
+    }
+
+    .fm-topbar-brand-text {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0d9488;
+    }
+
+    .fm-topbar-hamburger {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 1.25rem;
+        color: #1e3a5f;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+
+    .fm-topbar-hamburger:hover {
+        background: #f3f4f6;
+    }
+
+    .fm-topbar-title {
+        font-weight: 600;
+        color: #1e3a5f;
+        font-size: 1.1rem;
+    }
+
+    .fm-topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .fm-topbar-right a {
+        color: #6b7280;
+        text-decoration: none;
+        font-size: 0.85rem;
+        padding: 0.4rem 0.75rem;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .fm-topbar-right a:hover {
+        color: #1e3a5f;
+        background: #f3f4f6;
+    }
+
+    .fm-topbar-right a.logout-link {
+        color: #ef4444;
+    }
+
+    .fm-topbar-right a.logout-link:hover {
+        color: #fff;
+        background: #ef4444;
+    }
+
+    /* ===== MOBILE OVERLAY ===== */
+    .fm-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1035;
+    }
+
+    .fm-overlay.show {
+        display: block;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 767.98px) {
+        .fm-sidebar {
+            transform: translateX(-100%);
+            width: 260px !important;
+        }
+
+        .fm-sidebar.mobile-open {
+            transform: translateX(0);
+        }
+
+        .fm-sidebar .fm-sidebar-brand-text,
+        .fm-sidebar .fm-sidebar-user,
+        .fm-sidebar .fm-sidebar-section,
+        .fm-sidebar .fm-nav-label,
+        .fm-sidebar .fm-nav-badge {
+            opacity: 1 !important;
+            width: auto !important;
+        }
+
+        .fm-main {
+            margin-left: 0 !important;
+        }
+
+        .fm-topbar-hamburger {
+            display: block;
+        }
+
+        .fm-topbar-brand {
+            display: flex;
+        }
+
+        .fm-topbar-title {
+            display: none;
+        }
+    }
+
+    @media (min-width: 768px) and (max-width: 991.98px) {
+        .fm-sidebar {
+            width: 70px !important;
+        }
+
+        .fm-sidebar .fm-sidebar-brand-text,
+        .fm-sidebar .fm-sidebar-user,
+        .fm-sidebar .fm-sidebar-section,
+        .fm-sidebar .fm-nav-label,
+        .fm-sidebar .fm-nav-badge {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .fm-main {
+            margin-left: 70px !important;
+        }
     }
 </style>
-<nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-    <div class="position-sticky pt-3">
-        <div class="sidebar-brand">
-            <i class="fas fa-chart-line me-2"></i>FinMate
-        </div>
-        <% if (userName) { %>
-            <div class="text-center text-white-50 mb-3 px-3">
-                <small><i class="fas fa-user me-1"></i><%= userName %></small>
-            </div>
-        <% } %>
-        <ul class="nav flex-column">
-            <li class="nav-item">
-                <a class="nav-link <%= activePage === 'dashboard' ? 'active' : '' %>" href="/user/dashboard">
-                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= activePage === 'expenses' ? 'active' : '' %>" href="/user/expenses">
-                    <i class="fas fa-receipt me-2"></i>Expenses
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= activePage === 'incomes' ? 'active' : '' %>" href="/user/incomes">
-                    <i class="fas fa-money-bill-wave me-2"></i>Incomes
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= activePage === 'budgets' ? 'active' : '' %>" href="/user/budgets">
-                    <i class="fas fa-wallet me-2"></i>Budgets
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= activePage === 'savings' ? 'active' : '' %>" href="/user/savings">
-                    <i class="fas fa-piggy-bank me-2"></i>Savings Goals
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= activePage === 'planned-expenses' ? 'active' : '' %>" href="/user/planned-expenses">
-                    <i class="fas fa-calendar-check me-2"></i>Planned Expenses
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= activePage === 'upcoming-expenses' ? 'active' : '' %>" href="/user/upcoming-expenses">
-                    <i class="fas fa-clock me-2"></i>Upcoming Expenses
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= activePage === 'analytics' ? 'active' : '' %>" href="/user/analytics">
-                    <i class="fas fa-chart-bar me-2"></i>Analytics
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= activePage === 'notifications' ? 'active' : '' %>" href="/user/notifications">
-                    <i class="fas fa-bell me-2"></i>Notifications
-                    <% if (notifCount > 0) { %>
-                        <span class="badge bg-danger float-end"><%= notifCount %></span>
-                    <% } %>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= activePage === 'settings' ? 'active' : '' %>" href="/user/settings">
-                    <i class="fas fa-cog me-2"></i>Settings
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link <%= activePage === 'profile' ? 'active' : '' %>" href="/user/profile">
-                    <i class="fas fa-user me-2"></i>Profile
-                </a>
-            </li>
-            <li class="nav-item mt-3">
-                <a class="nav-link" href="/auth/logout" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                    <i class="fas fa-sign-out-alt me-2"></i>Logout
-                </a>
-                <form id="logout-form" action="/auth/logout" method="POST" style="display: none;"></form>
-            </li>
-        </ul>
+
+<!-- Mobile Overlay -->
+<div class="fm-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- Sidebar -->
+<nav class="fm-sidebar" id="appSidebar">
+    <div class="fm-sidebar-brand">
+        <span class="fm-sidebar-brand-icon"><i class="fas fa-chart-line"></i></span>
+        <span class="fm-sidebar-brand-text">FinMate</span>
+    </div>
+
+    <% if (userName) { %>
+    <div class="fm-sidebar-user">
+        <small><i class="fas fa-user me-1"></i><%= userName %></small>
+    </div>
+    <% } %>
+
+    <div class="fm-sidebar-nav">
+        <% var lastSection = ''; %>
+        <% menu.forEach(function(item) { %>
+            <% if (item.section) { %>
+                <% if (item.section !== lastSection) { %>
+                    <div class="fm-sidebar-section"><%= item.section %></div>
+                    <% lastSection = item.section; %>
+                <% } %>
+            <% } else { %>
+            <a class="fm-nav-link <%= activePage === item.page ? 'active' : '' %>" href="<%= item.href %>">
+                <i class="fas <%= item.icon %>"></i>
+                <span class="fm-nav-label"><%= item.label %></span>
+                <% if (item.badge && item.badge > 0) { %>
+                    <span class="badge bg-danger fm-nav-badge"><%= item.badge %></span>
+                <% } %>
+            </a>
+            <% } %>
+        <% }); %>
+    </div>
+
+    <div class="fm-sidebar-footer">
+        <a class="fm-nav-link" href="<%= logoutPath %>" onclick="event.preventDefault(); document.getElementById('logout-form-sidebar').submit();">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="fm-nav-label">Logout</span>
+        </a>
+        <form id="logout-form-sidebar" action="<%= logoutPath %>" method="POST" style="display:none;"></form>
+        <button class="fm-sidebar-toggle" onclick="toggleSidebar()" title="Toggle sidebar">
+            <i class="fas fa-angles-left"></i>
+            <span>Collapse</span>
+        </button>
     </div>
 </nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var sidebar = document.getElementById('appSidebar');
+    var overlay = document.getElementById('sidebarOverlay');
+
+    function getMain() {
+        return document.querySelector('.fm-main');
+    }
+
+    // Restore collapsed state from localStorage
+    if (localStorage.getItem('fm-sidebar-collapsed') === 'true' && window.innerWidth >= 992) {
+        sidebar.classList.add('collapsed');
+        var m = getMain();
+        if (m) m.classList.add('sidebar-collapsed');
+    }
+
+    window.toggleSidebar = function() {
+        var main = getMain();
+        if (window.innerWidth < 768) {
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('show');
+            document.body.style.overflow = sidebar.classList.contains('mobile-open') ? 'hidden' : '';
+        } else {
+            sidebar.classList.toggle('collapsed');
+            if (main) main.classList.toggle('sidebar-collapsed');
+            localStorage.setItem('fm-sidebar-collapsed', sidebar.classList.contains('collapsed'));
+        }
+    };
+
+    window.closeSidebar = function() {
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('show');
+        document.body.style.overflow = '';
+    };
+
+    var hamburger = document.querySelector('.fm-topbar-hamburger');
+    if (hamburger) {
+        hamburger.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleSidebar();
+        });
+    }
+
+    window.addEventListener('resize', function() {
+        if (window.innerWidth >= 768) {
+            closeSidebar();
+        }
+    });
+
+    // URL obfuscation - show scrambled path in browser address bar
+    try {
+        var realPath = window.location.pathname;
+        var encoded = btoa(realPath).replace(/=/g, '').substring(0, 16);
+        window.history.replaceState(null, '', '/app/' + encoded);
+    } catch(e) {}
+});
+</script>
+<link rel="stylesheet" href="/css/walkthrough.css">
+<script src="/js/walkthrough.js" defer></script>

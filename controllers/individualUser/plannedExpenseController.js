@@ -22,7 +22,7 @@ const getPlannedExpenses = async (req, res) => {
       title: 'Planned Expenses',
       currentPage: 'planned-expenses',
       user: req.user,
-      error: 'Failed to load planned expenses'
+      error: "Couldn't load your planned expenses. Please try again."
     });
   }
 };
@@ -53,7 +53,7 @@ const postAddPlannedExpense = async (req, res) => {
       title: 'Add Planned Expense',
       currentPage: 'planned-expenses',
       user: req.user,
-      error: 'Failed to add planned expense'
+      error: "Couldn't add the planned expense. Please try again."
     });
   }
 };
@@ -69,7 +69,7 @@ const getEditPlannedExpense = async (req, res) => {
     if (plannedExpenses.length === 0) {
       return res.status(404).render('error', { 
         title: 'Not Found',
-        error: 'Planned expense not found' 
+        error: "That planned expense couldn't be found." 
       });
     }
     
@@ -85,7 +85,7 @@ const getEditPlannedExpense = async (req, res) => {
       title: 'Edit Planned Expense',
       currentPage: 'planned-expenses',
       user: req.user,
-      error: 'Failed to load planned expense'
+      error: "Couldn't load that expense. Please try again."
     });
   }
 };
@@ -110,7 +110,7 @@ const postEditPlannedExpense = async (req, res) => {
       title: 'Edit Planned Expense',
       currentPage: 'planned-expenses',
       user: req.user,
-      error: 'Failed to update planned expense'
+      error: "Couldn't update that expense. Please try again."
     });
   }
 };
@@ -126,7 +126,7 @@ const deletePlannedExpense = async (req, res) => {
     res.redirect('/user/planned-expenses?success=true&message=Planned expense deleted successfully');
   } catch (error) {
     console.error('Delete planned expense error:', error);
-    res.redirect('/user/planned-expenses?error=Failed to delete planned expense');
+    res.redirect("/user/planned-expenses?error=Couldn't delete the expense. Please try again.");
   }
 };
 

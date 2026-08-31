@@ -52,11 +52,30 @@ router.get('/dashboard', (req, res) => {
 });
 
 // Main Pages - Render EJS templates
-router.get('/teams', (req, res) => {
-  res.render('teamLeader/teams/index', {
-    title: 'Team Management - FinMate',
-    user: req.user
-  });
+router.get('/teams', async (req, res) => {
+  try {
+    const db = require('../config/db');
+    const [teams] = await db.pool.execute(
+      `SELECT t.*, u.username as leader_name, 
+       (SELECT COUNT(*) FROM users WHERE team_id = t.id) as member_count
+       FROM teams t 
+       LEFT JOIN users u ON t.team_leader_id = u.id 
+       WHERE t.team_leader_id = ?`,
+      [req.user.userId]
+    );
+    res.render('teamLeader/teams/index', {
+      title: 'Team Management - FinMate',
+      user: req.user,
+      teams: teams || []
+    });
+  } catch (error) {
+    console.error('Team leader teams error:', error);
+    res.render('teamLeader/teams/index', {
+      title: 'Team Management - FinMate',
+      user: req.user,
+      teams: []
+    });
+  }
 });
 
 router.get('/expenses', (req, res) => {

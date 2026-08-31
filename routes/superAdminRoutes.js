@@ -235,16 +235,15 @@ router.get('/audit-logs', async (req, res) => {
     }
     total = countResult[0].total;
 
-    // Execute data query with pagination using template literals instead of parameters
+    // Execute data query with pagination using parameterized LIMIT/OFFSET
     let auditLogs = [];
     if (total > 0) {
-      const paginatedQuery = baseQuery + ` LIMIT ${limit} OFFSET ${offset}`;
-      console.log('Paginated query:', paginatedQuery);
+      const paginatedQuery = baseQuery + ` LIMIT ? OFFSET ?`;
       
       if (queryParams.length > 0) {
-        [auditLogs] = await db.pool.execute(paginatedQuery, queryParams);
+        [auditLogs] = await db.pool.execute(paginatedQuery, [...queryParams, limit, offset]);
       } else {
-        [auditLogs] = await db.pool.execute(paginatedQuery);
+        [auditLogs] = await db.pool.execute(paginatedQuery, [limit, offset]);
       }
     }
 
@@ -317,6 +316,93 @@ router.get('/audit-logs', async (req, res) => {
       filters: {},
       error: errorMessage
     });
+  }
+});
+
+// Export Audit Logs (MUST be before /:id to avoid route conflict)
+router.get('/audit-logs/export', async (req, res) => {
+  try {
+    const format = req.query.format || 'csv';
+    const { search, action, user_id, start_date, end_date } = req.query;
+
+    let query = `
+      SELECT 
+        al.id,
+        al.action,
+        al.description,
+        al.ip_address,
+        al.user_agent,
+        u.username,
+        u.email,
+        CONCAT(u.first_name, ' ', u.last_name) as user_full_name,
+        al.old_values,
+        al.new_values,
+        al.created_at
+      FROM audit_logs al
+      LEFT JOIN users u ON al.user_id = u.id
+      WHERE 1=1
+    `;
+
+    const queryParams = [];
+
+    if (search) {
+      query += ` AND (al.action LIKE ? OR al.description LIKE ? OR al.ip_address LIKE ? OR u.username LIKE ?)`;
+      const searchTerm = `%${search}%`;
+      queryParams.push(searchTerm, searchTerm, searchTerm, searchTerm);
+    }
+
+    if (action) {
+      query += ` AND al.action = ?`;
+      queryParams.push(action);
+    }
+
+    if (user_id) {
+      query += ` AND al.user_id = ?`;
+      queryParams.push(user_id);
+    }
+
+    if (start_date) {
+      query += ` AND DATE(al.created_at) >= ?`;
+      queryParams.push(start_date);
+    }
+
+    if (end_date) {
+      query += ` AND DATE(al.created_at) <= ?`;
+      queryParams.push(end_date);
+    }
+
+    query += ` ORDER BY al.created_at DESC LIMIT 10000`;
+
+    const [auditLogs] = await db.pool.execute(query, queryParams);
+
+    if (format === 'json') {
+      res.setHeader('Content-Type', 'application/json');
+      res.setHeader('Content-Disposition', 'attachment; filename=audit-logs.json');
+      res.send(JSON.stringify(auditLogs, null, 2));
+    } else {
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename=audit-logs.csv');
+      const headers = ['ID', 'Action', 'Description', 'IP Address', 'User Agent', 'Username', 'Email', 'User Full Name', 'Timestamp'];
+      res.write(headers.join(',') + '\n');
+      auditLogs.forEach(log => {
+        const row = [
+          log.id,
+          `"${log.action}"`,
+          `"${log.description?.replace(/"/g, '""') || ''}"`,
+          `"${log.ip_address}"`,
+          `"${log.user_agent?.replace(/"/g, '""') || ''}"`,
+          `"${log.username}"`,
+          `"${log.email}"`,
+          `"${log.user_full_name}"`,
+          `"${new Date(log.created_at).toISOString()}"`
+        ];
+        res.write(row.join(',') + '\n');
+      });
+      res.end();
+    }
+  } catch (error) {
+    console.error('Export audit logs error:', error);
+    res.redirect('/super-admin/audit-logs?error=Failed to export audit logs');
   }
 });
 
@@ -402,99 +488,6 @@ router.post('/audit-logs/clear', async (req, res) => {
   } catch (error) {
     console.error('Clear audit logs error:', error);
     res.redirect('/super-admin/audit-logs?error=Failed to clear audit logs');
-  }
-});
-
-// Export Audit Logs
-router.get('/audit-logs/export', async (req, res) => {
-  try {
-    const format = req.query.format || 'csv';
-    const { search, action, user_id, start_date, end_date } = req.query;
-
-    let query = `
-      SELECT 
-        al.id,
-        al.action,
-        al.description,
-        al.ip_address,
-        al.user_agent,
-        u.username,
-        u.email,
-        CONCAT(u.first_name, ' ', u.last_name) as user_full_name,
-        al.old_values,
-        al.new_values,
-        al.created_at
-      FROM audit_logs al
-      LEFT JOIN users u ON al.user_id = u.id
-      WHERE 1=1
-    `;
-
-    const queryParams = [];
-
-    if (search) {
-      query += ` AND (al.action LIKE ? OR al.description LIKE ? OR al.ip_address LIKE ? OR u.username LIKE ?)`;
-      const searchTerm = `%${search}%`;
-      queryParams.push(searchTerm, searchTerm, searchTerm, searchTerm);
-    }
-
-    if (action) {
-      query += ` AND al.action = ?`;
-      queryParams.push(action);
-    }
-
-    if (user_id) {
-      query += ` AND al.user_id = ?`;
-      queryParams.push(user_id);
-    }
-
-    if (start_date) {
-      query += ` AND DATE(al.created_at) >= ?`;
-      queryParams.push(start_date);
-    }
-
-    if (end_date) {
-      query += ` AND DATE(al.created_at) <= ?`;
-      queryParams.push(end_date);
-    }
-
-    query += ` ORDER BY al.created_at DESC LIMIT 10000`;
-
-    const [auditLogs] = await db.pool.execute(query, queryParams);
-
-    if (format === 'json') {
-      res.setHeader('Content-Type', 'application/json');
-      res.setHeader('Content-Disposition', 'attachment; filename=audit-logs.json');
-      res.send(JSON.stringify(auditLogs, null, 2));
-    } else {
-      // CSV format
-      res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', 'attachment; filename=audit-logs.csv');
-      
-      // CSV header
-      const headers = ['ID', 'Action', 'Description', 'IP Address', 'User Agent', 'Username', 'Email', 'User Full Name', 'Timestamp'];
-      res.write(headers.join(',') + '\n');
-      
-      // CSV data
-      auditLogs.forEach(log => {
-        const row = [
-          log.id,
-          `"${log.action}"`,
-          `"${log.description?.replace(/"/g, '""') || ''}"`,
-          `"${log.ip_address}"`,
-          `"${log.user_agent?.replace(/"/g, '""') || ''}"`,
-          `"${log.username}"`,
-          `"${log.email}"`,
-          `"${log.user_full_name}"`,
-          `"${new Date(log.created_at).toISOString()}"`
-        ];
-        res.write(row.join(',') + '\n');
-      });
-      
-      res.end();
-    }
-  } catch (error) {
-    console.error('Export audit logs error:', error);
-    res.redirect('/super-admin/audit-logs?error=Failed to export audit logs');
   }
 });
 
@@ -1410,8 +1403,8 @@ router.get('/notifications', async (req, res) => {
         FROM notifications n 
         LEFT JOIN users u ON n.user_id = u.id 
         ORDER BY n.created_at DESC 
-        LIMIT ${limit} OFFSET ${offset}
-      `);
+        LIMIT ? OFFSET ?
+      `, [limit, offset]);
       notifications = notificationsResult || [];
 
       // Get total count
@@ -1463,6 +1456,50 @@ router.get('/notifications', async (req, res) => {
       success: null,
       error: 'Failed to load notifications: ' + error.message
     });
+  }
+});
+
+// Mark single notification as read
+router.post('/notifications/mark-read/:id', async (req, res) => {
+  try {
+    await db.pool.execute('UPDATE notifications SET is_read = true WHERE id = ?', [req.params.id]);
+    res.redirect('/super-admin/notifications?success=Notification marked as read');
+  } catch (error) {
+    console.error('Mark read error:', error);
+    res.redirect('/super-admin/notifications?error=Failed to mark notification');
+  }
+});
+
+// Mark all notifications as read
+router.post('/notifications/mark-all-read', async (req, res) => {
+  try {
+    await db.pool.execute('UPDATE notifications SET is_read = true');
+    res.redirect('/super-admin/notifications?success=All notifications marked as read');
+  } catch (error) {
+    console.error('Mark all read error:', error);
+    res.redirect('/super-admin/notifications?error=Failed to mark all as read');
+  }
+});
+
+// Delete single notification
+router.post('/notifications/delete/:id', async (req, res) => {
+  try {
+    await db.pool.execute('DELETE FROM notifications WHERE id = ?', [req.params.id]);
+    res.redirect('/super-admin/notifications?success=Notification deleted');
+  } catch (error) {
+    console.error('Delete notification error:', error);
+    res.redirect('/super-admin/notifications?error=Failed to delete notification');
+  }
+});
+
+// Clear all notifications
+router.post('/notifications/clear-all', async (req, res) => {
+  try {
+    await db.pool.execute('DELETE FROM notifications');
+    res.redirect('/super-admin/notifications?success=All notifications cleared');
+  } catch (error) {
+    console.error('Clear all error:', error);
+    res.redirect('/super-admin/notifications?error=Failed to clear notifications');
   }
 });
 

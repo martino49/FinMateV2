@@ -84,7 +84,7 @@ const userController = {
         roles,
         teams,
         user: req.user,
-        error: 'An error occurred while adding user'
+        error: "Couldn't add the user. Please try again."
       });
     }
   },
@@ -149,7 +149,7 @@ const userController = {
       console.error('Delete user error:', error);
       
       if (req.xhr || req.headers.accept?.includes('application/json')) {
-        return res.status(500).json({ success: false, message: 'Error deleting user' });
+        return res.status(500).json({ success: false, message: "Couldn't delete the user. Please try again." });
       }
       
       res.redirect('/super-admin/users');

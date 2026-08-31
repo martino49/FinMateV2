@@ -1,0 +1,186 @@
+/* ============================================
+   FIRST-TIME WALKTHROUGH OVERLAY
+   ============================================ */
+
+.walkthrough-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.75);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.walkthrough-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.walkthrough-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+  width: 90%;
+  max-width: 520px;
+  padding: 2.5rem;
+  position: relative;
+  transform: translateY(20px) scale(0.97);
+  transition: transform 0.3s ease;
+  overflow: hidden;
+}
+
+.walkthrough-overlay.active .walkthrough-card {
+  transform: translateY(0) scale(1);
+}
+
+.walkthrough-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #1e3a5f, #0d9488);
+}
+
+.walkthrough-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: #94a3b8;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.15s;
+}
+
+.walkthrough-close:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.walkthrough-step-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.25rem;
+  color: #fff;
+}
+
+.walkthrough-step-icon.icon-nav { background: linear-gradient(135deg, #1e3a5f, #2d5a8e); }
+.walkthrough-step-icon.icon-dash { background: linear-gradient(135deg, #0d9488, #14b8a6); }
+.walkthrough-step-icon.icon-expense { background: linear-gradient(135deg, #f59e0b, #f97316); }
+.walkthrough-step-icon.icon-budget { background: linear-gradient(135deg, #16a34a, #22c55e); }
+.walkthrough-step-icon.icon-notify { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+
+.walkthrough-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+}
+
+.walkthrough-desc {
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.walkthrough-progress {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.walkthrough-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  transition: all 0.2s;
+}
+
+.walkthrough-dot.active {
+  background: #1e3a5f;
+  width: 24px;
+  border-radius: 4px;
+}
+
+.walkthrough-dot.done {
+  background: #0d9488;
+}
+
+.walkthrough-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.walkthrough-btn {
+  padding: 0.6rem 1.5rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+
+.walkthrough-btn-skip {
+  background: transparent;
+  color: #94a3b8;
+}
+
+.walkthrough-btn-skip:hover {
+  color: #64748b;
+}
+
+.walkthrough-btn-next {
+  background: linear-gradient(135deg, #1e3a5f, #2d5a8e);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(30, 58, 95, 0.3);
+}
+
+.walkthrough-btn-next:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(30, 58, 95, 0.4);
+}
+
+.walkthrough-btn-done {
+  background: linear-gradient(135deg, #0d9488, #14b8a6);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.3);
+}
+
+.walkthrough-btn-done:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.4);
+}
+
+@media (max-width: 576px) {
+  .walkthrough-card {
+    padding: 1.75rem;
+    margin: 1rem;
+  }
+  .walkthrough-title {
+    font-size: 1.15rem;
+  }
+}

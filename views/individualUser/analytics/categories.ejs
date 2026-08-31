@@ -19,44 +19,64 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Category Analytics</h1>
-            <a href="/user/analytics" class="btn btn-outline-primary">← Back to Analytics</a>
-        </div>
+    <%- include('../../partials/sidebar', { user: user, currentPage: 'analytics', notificationCount: typeof notificationCount !== 'undefined' ? notificationCount : 0 }) %>
+    <div class="fm-main">
+        <nav class="fm-topbar">
+            <div class="fm-topbar-left">
+                <a class="fm-topbar-brand" href="/user/dashboard">
+                    <span class="fm-topbar-brand-icon"><i class="fas fa-chart-line"></i></span>
+                    <span class="fm-topbar-brand-text">FinMate</span>
+                </a>
+                <button class="fm-topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <span class="fm-topbar-title">Category Analytics</span>
+            </div>
+            <div class="fm-topbar-right">
+                <a href="/user/notifications"><i class="fas fa-bell"></i></a>
+                <a href="/auth/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </nav>
 
-        <!-- Category Details -->
-        <% if (categoryData && categoryData.length > 0) { %>
-            <% categoryData.forEach(category => { %>
-                <div class="category-card">
-                    <div class="row align-items-center">
-                        <div class="col-md-3">
-                            <h5 class="mb-0"><%= category.category %></h5>
-                        </div>
-                        <div class="col-md-9">
-                            <div class="row text-center">
-                                <div class="col">
-                                    <strong>$<%= category.amount.toFixed(2) %></strong>
-                                    <div class="text-muted small">Total Spent</div>
-                                </div>
-                                <div class="col">
-                                    <strong><%= category.count %></strong>
-                                    <div class="text-muted small">Transactions</div>
-                                </div>
-                                <div class="col">
-                                    <strong><%= category.percentage.toFixed(1) %>%</strong>
-                                    <div class="text-muted small">of Total</div>
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1>Category Analytics</h1>
+                <a href="/user/analytics" class="btn btn-outline-primary">← Back to Analytics</a>
+            </div>
+
+            <!-- Category Details -->
+            <% if (categoryData && categoryData.length > 0) { %>
+                <% categoryData.forEach(category => { %>
+                    <div class="category-card">
+                        <div class="row align-items-center">
+                            <div class="col-md-3">
+                                <h5 class="mb-0"><%= category.category %></h5>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="row text-center">
+                                    <div class="col">
+                                        <strong>$<%= category.amount.toFixed(2) %></strong>
+                                        <div class="text-muted small">Total Spent</div>
+                                    </div>
+                                    <div class="col">
+                                        <strong><%= category.count %></strong>
+                                        <div class="text-muted small">Transactions</div>
+                                    </div>
+                                    <div class="col">
+                                        <strong><%= category.percentage.toFixed(1) %>%</strong>
+                                        <div class="text-muted small">of Total</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                <% }) %>
+            <% } else { %>
+                <div class="alert alert-info">
+                    No category data available for the selected period.
                 </div>
-            <% }) %>
-        <% } else { %>
-            <div class="alert alert-info">
-                No category data available for the selected period.
-            </div>
-        <% } %>
+            <% } %>
+        </div>
     </div>
+<!-- end fm-main -->
+</div>
 </body>
 </html>

@@ -35,116 +35,6 @@
             overflow-x: hidden;
         }
 
-        /* Sidebar Styles */
-        .sidebar {
-            background: var(--primary-gradient);
-            min-height: 100vh;
-            box-shadow: var(--card-shadow);
-            position: fixed;
-            width: 280px;
-            z-index: 1000;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            left: 0;
-            top: 0;
-        }
-
-        .sidebar-brand {
-            padding: 2rem 1.5rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 1rem;
-        }
-
-        .sidebar-brand h3 {
-            color: white;
-            font-weight: 700;
-            font-size: 1.5rem;
-            margin: 0;
-        }
-
-        .sidebar-nav {
-            padding: 0 1rem;
-        }
-
-        .sidebar .nav-link {
-            color: rgba(255,255,255,0.85);
-            padding: 1rem 1.5rem;
-            margin: 0.25rem 0;
-            border-radius: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            position: relative;
-            overflow: hidden;
-            text-decoration: none;
-        }
-
-        .sidebar .nav-link::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 0;
-            background: rgba(255,255,255,0.15);
-            transition: width 0.3s ease;
-            border-radius: 12px;
-        }
-
-        .sidebar .nav-link:hover {
-            color: white;
-            transform: translateX(8px);
-            background: rgba(255,255,255,0.1);
-        }
-
-        .sidebar .nav-link:hover::before {
-            width: 100%;
-        }
-
-        .sidebar .nav-link.active {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            font-weight: 600;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            transform: translateX(8px);
-        }
-
-        .sidebar .nav-link.active::before {
-            width: 100%;
-        }
-
-        .sidebar .nav-link i {
-            width: 20px;
-            text-align: center;
-            font-size: 1.1rem;
-        }
-
-        /* Main Content Area */
-        .main-content {
-            margin-left: 280px;
-            padding: 0;
-            transition: all 0.3s ease;
-            min-height: 100vh;
-            background: var(--light-bg);
-        }
-
-        /* Top Navigation */
-        .navbar-top {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            padding: 1.25rem 2rem;
-            position: sticky;
-            top: 0;
-            z-index: 999;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .navbar-top .container-fluid {
-            padding: 0;
-        }
-
         /* Statistics Cards */
         .stat-card {
             border: none;
@@ -355,11 +245,11 @@
         .status-offline { background: var(--danger-color); }
 
         @keyframes pulse {
-            0%, 100% { 
+            0%, 100% {
                 opacity: 1;
                 box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
             }
-            50% { 
+            50% {
                 opacity: 0.8;
                 box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
             }
@@ -382,24 +272,6 @@
         .btn-outline-secondary:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-
-        /* Mobile Menu Button */
-        .mobile-menu-btn {
-            display: none;
-            background: var(--primary-gradient);
-            border: none;
-            color: white;
-            width: 45px;
-            height: 45px;
-            border-radius: 12px;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .mobile-menu-btn:hover {
-            transform: scale(1.05);
         }
 
         /* Loading Animation */
@@ -438,34 +310,6 @@
         }
 
         /* Responsive Design */
-        @media (max-width: 1200px) {
-            .sidebar {
-                width: 250px;
-            }
-            .main-content {
-                margin-left: 250px;
-            }
-        }
-
-        @media (max-width: 992px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-            }
-            .sidebar.mobile-open {
-                transform: translateX(0);
-            }
-            .main-content {
-                margin-left: 0;
-            }
-            .mobile-menu-btn {
-                display: flex !important;
-            }
-            .navbar-top {
-                padding: 1rem;
-            }
-        }
-
         @media (max-width: 768px) {
             .container-fluid.py-4 {
                 padding: 1rem !important;
@@ -492,9 +336,6 @@
         }
 
         @media (max-width: 576px) {
-            .navbar-top {
-                padding: 0.75rem 1rem;
-            }
             .welcome-card h3 {
                 font-size: 1.5rem;
             }
@@ -510,401 +351,290 @@
                 padding: 0.75rem 0;
             }
         }
-
-        /* Overlay for mobile */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-        }
-
-        .sidebar-overlay.active {
-            display: block;
-        }
     </style>
 </head>
 <body>
-    <!-- Mobile Overlay -->
-    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <%- include('../partials/sidebar', { user: user, currentPage: 'dashboard' }) %>
+    <div class="fm-main">
+        <nav class="fm-topbar">
+            <div class="fm-topbar-left">
+                <a class="fm-topbar-brand" href="/admin/dashboard">
+                    <span class="fm-topbar-brand-icon"><i class="fas fa-chart-line"></i></span>
+                    <span class="fm-topbar-brand-text">FinMate</span>
+                </a>
+                <button class="fm-topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <span class="fm-topbar-title">Admin Dashboard</span>
+            </div>
+            <div class="fm-topbar-right">
+                <a href="/admin/notifications"><i class="fas fa-bell"></i></a>
+                <a href="/auth/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </nav>
 
-    <div class="container-fluid p-0">
-        <div class="row g-0">
-            <!-- Sidebar -->
-             <%- include('../partials/admin-sidebar') %>
-            <!-- <div class="sidebar" id="sidebar">
-                <div class="sidebar-brand">
-                    <h3><i class="fas fa-crown me-2"></i>FinMate Admin</h3>
+        <!-- Main Content Area -->
+        <div class="container-fluid py-4 animate-fade-in">
+            <!-- Success/Error Messages -->
+            <% if (locals.success) { %>
+                <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <%= locals.success %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-                <nav class="sidebar-nav">
-                    <a href="/admin/dashboard" class="nav-link active">
-                        <i class="fas fa-tachometer-alt"></i>
-                        Dashboard
-                    </a>
-                    <a href="/admin/users" class="nav-link">
-                        <i class="fas fa-users"></i>
-                        User Management
-                    </a>
-                    <a href="/admin/budgets" class="nav-link">
-                        <i class="fas fa-wallet"></i>
-                        Budget Management
-                    </a>
-                    <a href="/admin/expenses" class="nav-link">
-                        <i class="fas fa-money-bill-wave"></i>
-                        Expense Management
-                    </a>
-                    <a href="/admin/teams" class="nav-link">
-                        <i class="fas fa-sitemap"></i>
-                        Team Management
-                    </a>
-                    <a href="/admin/reports" class="nav-link">
-                        <i class="fas fa-chart-bar"></i>
-                        Reports & Analytics
-                    </a>
-                    <a href="/admin/notifications" class="nav-link">
-                        <i class="fas fa-bell"></i>
-                        Notifications
-                    </a>
-                    <% if (user.role === 'super_admin') { %>
-                    <div class="mt-4 pt-3 border-top border-white-10">
-                        <small class="text-white-50 px-3 mb-2 d-block">SUPER ADMIN</small>
-                        <a href="/admin/system-settings" class="nav-link">
-                            <i class="fas fa-cogs"></i>
-                            System Settings
-                        </a>
-                        <a href="/admin/role-management" class="nav-link">
-                            <i class="fas fa-user-shield"></i>
-                            Role Management
-                        </a>
-                        <a href="/admin/database" class="nav-link">
-                            <i class="fas fa-database"></i>
-                            Database Tools
-                        </a>
-                    </div>
-                    <% } %>
-                    <div class="mt-4 pt-3 border-top border-white-10">
-                        <a href="/admin/profile" class="nav-link">
-                            <i class="fas fa-user"></i>
-                            My Profile
-                        </a>
-                        <a href="/auth/logout" class="nav-link">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Logout
-                        </a>
-                    </div>
-                </nav>
-            </div> -->
+            <% } %>
+            
+            <% if (locals.error) { %>
+                <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <%= locals.error %>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            <% } %>
 
-            <!-- Main Content -->
-            <div class="main-content col">
-                <!-- Top Navigation -->
-                <nav class="navbar-top">
-                    <div class="container-fluid">
-                        <div class="d-flex justify-content-between align-items-center w-100">
-                            <div class="d-flex align-items-center gap-3">
-                                <button class="mobile-menu-btn" id="sidebarToggle">
-                                    <i class="fas fa-bars"></i>
-                                </button>
-                                <div>
-                                    <h2 class="h4 mb-0 fw-bold text-dark">
-                                        <i class="fas fa-crown me-2 text-warning"></i>
-                                        Admin Dashboard
-                                    </h2>
-                                    <p class="text-muted mb-0 small">Welcome back, <%= user.first_name || user.username %>!</p>
-                                </div>
+            <!-- Welcome Banner -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="welcome-card p-5">
+                        <div class="row align-items-center">
+                            <div class="col-lg-8">
+                                <h3 class="fw-bold mb-3">Welcome to Admin Panel</h3>
+                                <p class="mb-0 opacity-90 fs-6">Manage users, budgets, expenses, and system-wide settings from this centralized dashboard. Everything you need to oversee your financial operations.</p>
                             </div>
-                            <div class="d-flex align-items-center gap-3">
-                                <span class="user-badge">
-                                    <i class="fas fa-user me-2"></i>
-                                    <%= user.first_name %> <%= user.last_name %>
-                                    <span class="badge bg-light text-dark ms-2"><%= user.role_name %></span>
-                                </span>
-                                <div class="dropdown">
-                                    <button class="btn btn-light rounded-circle" type="button" data-bs-toggle="dropdown" style="width: 45px; height: 45px;">
-                                        <i class="fas fa-cog"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0">
-                                        <li><a class="dropdown-item" href="/admin/profile"><i class="fas fa-user me-2"></i>Profile</a></li>
-                                        <li><a class="dropdown-item" href="/admin/notifications"><i class="fas fa-bell me-2"></i>Notifications</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="/auth/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-                                    </ul>
+                            <div class="col-lg-4 text-lg-end text-center mt-3 mt-lg-0">
+                                <i class="fas fa-rocket fa-5x opacity-25"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 mb-4">
+                    <div class="stat-card stat-card-primary h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-uppercase text-muted small fw-bold mb-2">Total Users</h6>
+                                    <h2 class="fw-bold text-dark mb-1 display-6"><%= stats && stats.totalUsers ? stats.totalUsers : 0 %></h2>
+                                    <span class="text-success small fw-bold">
+                                        <i class="fas fa-arrow-up me-1"></i>Active
+                                    </span>
+                                </div>
+                                <div class="stat-icon stat-icon-primary">
+                                    <i class="fas fa-users"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </nav>
+                </div>
 
-                <!-- Main Content Area -->
-                <div class="container-fluid py-4 animate-fade-in">
-                    <!-- Success/Error Messages -->
-                    <% if (locals.success) { %>
-                        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                            <i class="fas fa-check-circle me-2"></i>
-                            <%= locals.success %>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    <% } %>
-                    
-                    <% if (locals.error) { %>
-                        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-                            <i class="fas fa-exclamation-circle me-2"></i>
-                            <%= locals.error %>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    <% } %>
-
-                    <!-- Welcome Banner -->
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="welcome-card p-5">
-                                <div class="row align-items-center">
-                                    <div class="col-lg-8">
-                                        <h3 class="fw-bold mb-3">Welcome to Admin Panel</h3>
-                                        <p class="mb-0 opacity-90 fs-6">Manage users, budgets, expenses, and system-wide settings from this centralized dashboard. Everything you need to oversee your financial operations.</p>
-                                    </div>
-                                    <div class="col-lg-4 text-lg-end text-center mt-3 mt-lg-0">
-                                        <i class="fas fa-rocket fa-5x opacity-25"></i>
-                                    </div>
+                <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 mb-4">
+                    <div class="stat-card stat-card-success h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-uppercase text-muted small fw-bold mb-2">Total Budgets</h6>
+                                    <h2 class="fw-bold text-dark mb-1 display-6"><%= stats && stats.totalBudgets ? stats.totalBudgets : 0 %></h2>
+                                    <span class="text-success small fw-bold">
+                                        <i class="fas fa-check-circle me-1"></i>Active
+                                    </span>
+                                </div>
+                                <div class="stat-icon stat-icon-success">
+                                    <i class="fas fa-wallet"></i>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Statistics Cards -->
-                    <div class="row mb-4">
-                        <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 mb-4">
-                            <div class="stat-card stat-card-primary h-100">
-                                <div class="card-body p-4">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <h6 class="text-uppercase text-muted small fw-bold mb-2">Total Users</h6>
-                                            <h2 class="fw-bold text-dark mb-1 display-6"><%= stats && stats.totalUsers ? stats.totalUsers : 0 %></h2>
-                                            <span class="text-success small fw-bold">
-                                                <i class="fas fa-arrow-up me-1"></i>Active
-                                            </span>
+                <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 mb-4">
+                    <div class="stat-card stat-card-warning h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-uppercase text-muted small fw-bold mb-2">Total Expenses</h6>
+                                    <h2 class="fw-bold text-dark mb-1 display-6"><%= stats && stats.totalExpenses ? stats.totalExpenses : 0 %></h2>
+                                    <span class="text-warning small fw-bold">
+                                        <i class="fas fa-clock me-1"></i>Tracked
+                                    </span>
+                                </div>
+                                <div class="stat-icon stat-icon-warning">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 mb-4">
+                    <div class="stat-card stat-card-info h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-uppercase text-muted small fw-bold mb-2">Pending Expenses</h6>
+                                    <h2 class="fw-bold text-dark mb-1 display-6"><%= stats && stats.pendingExpenses ? stats.pendingExpenses : 0 %></h2>
+                                    <span class="text-info small fw-bold">
+                                        <i class="fas fa-hourglass-half me-1"></i>Awaiting Review
+                                    </span>
+                                </div>
+                                <div class="stat-icon stat-icon-info">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 mb-4">
+                    <div class="stat-card stat-card-dark h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-uppercase text-muted small fw-bold mb-2">Active Teams</h6>
+                                    <h2 class="fw-bold text-dark mb-1 display-6"><%= stats && stats.totalTeams ? stats.totalTeams : 0 %></h2>
+                                    <span class="text-success small fw-bold">
+                                        <i class="fas fa-check me-1"></i>Active
+                                    </span>
+                                </div>
+                                <div class="stat-icon stat-icon-dark">
+                                    <i class="fas fa-sitemap"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 mb-4">
+                    <div class="stat-card stat-card-danger h-100">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="text-uppercase text-muted small fw-bold mb-2">Notifications</h6>
+                                    <h2 class="fw-bold text-dark mb-1 display-6"><%= stats && stats.pendingNotifications ? stats.pendingNotifications : 0 %></h2>
+                                    <span class="text-warning small fw-bold">
+                                        <i class="fas fa-bell me-1"></i>Unread
+                                    </span>
+                                </div>
+                                <div class="stat-icon stat-icon-danger">
+                                    <i class="fas fa-bell"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions & System Info -->
+            <div class="row">
+                <!-- Quick Actions -->
+                <div class="col-xl-8 col-lg-7 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center">
+                            <i class="fas fa-bolt me-3 text-warning fs-5"></i>
+                            <h5 class="card-title mb-0 fw-bold">Quick Actions</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-3">
+                                <div class="col-xxl-4 col-lg-6 col-md-6">
+                                    <a href="/admin/users/add" class="quick-action-btn text-center">
+                                        <div class="action-icon bg-primary bg-opacity-10 text-primary">
+                                            <i class="fas fa-user-plus"></i>
                                         </div>
-                                        <div class="stat-icon stat-icon-primary">
-                                            <i class="fas fa-users"></i>
-                                        </div>
-                                    </div>
+                                        <h6 class="fw-bold mb-2">Add User</h6>
+                                        <p class="text-muted small mb-0">Create new user account with roles</p>
+                                    </a>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 mb-4">
-                            <div class="stat-card stat-card-success h-100">
-                                <div class="card-body p-4">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <h6 class="text-uppercase text-muted small fw-bold mb-2">Total Budgets</h6>
-                                            <h2 class="fw-bold text-dark mb-1 display-6"><%= stats && stats.totalBudgets ? stats.totalBudgets : 0 %></h2>
-                                            <span class="text-success small fw-bold">
-                                                <i class="fas fa-check-circle me-1"></i>Active
-                                            </span>
-                                        </div>
-                                        <div class="stat-icon stat-icon-success">
+                                <div class="col-xxl-4 col-lg-6 col-md-6">
+                                    <a href="/admin/budgets/create" class="quick-action-btn text-center">
+                                        <div class="action-icon bg-success bg-opacity-10 text-success">
                                             <i class="fas fa-wallet"></i>
                                         </div>
-                                    </div>
+                                        <h6 class="fw-bold mb-2">Create Budget</h6>
+                                        <p class="text-muted small mb-0">Set up new budget allocation</p>
+                                    </a>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 mb-4">
-                            <div class="stat-card stat-card-warning h-100">
-                                <div class="card-body p-4">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <h6 class="text-uppercase text-muted small fw-bold mb-2">Total Expenses</h6>
-                                            <h2 class="fw-bold text-dark mb-1 display-6"><%= stats && stats.totalExpenses ? stats.totalExpenses : 0 %></h2>
-                                            <span class="text-warning small fw-bold">
-                                                <i class="fas fa-clock me-1"></i>Tracked
-                                            </span>
-                                        </div>
-                                        <div class="stat-icon stat-icon-warning">
+                                <div class="col-xxl-4 col-lg-6 col-md-6">
+                                    <a href="/admin/expenses" class="quick-action-btn text-center">
+                                        <div class="action-icon bg-warning bg-opacity-10 text-warning">
                                             <i class="fas fa-money-bill-wave"></i>
                                         </div>
-                                    </div>
+                                        <h6 class="fw-bold mb-2">Manage Expenses</h6>
+                                        <p class="text-muted small mb-0">Review and approve expenses</p>
+                                    </a>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 mb-4">
-                            <div class="stat-card stat-card-info h-100">
-                                <div class="card-body p-4">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <h6 class="text-uppercase text-muted small fw-bold mb-2">Pending Expenses</h6>
-                                            <h2 class="fw-bold text-dark mb-1 display-6"><%= stats && stats.pendingExpenses ? stats.pendingExpenses : 0 %></h2>
-                                            <span class="text-info small fw-bold">
-                                                <i class="fas fa-hourglass-half me-1"></i>Awaiting Review
-                                            </span>
+                                <div class="col-xxl-4 col-lg-6 col-md-6">
+                                    <a href="/admin/teams" class="quick-action-btn text-center">
+                                        <div class="action-icon bg-info bg-opacity-10 text-info">
+                                            <i class="fas fa-users-cog"></i>
                                         </div>
-                                        <div class="stat-icon stat-icon-info">
-                                            <i class="fas fa-clock"></i>
-                                        </div>
-                                    </div>
+                                        <h6 class="fw-bold mb-2">Manage Teams</h6>
+                                        <p class="text-muted small mb-0">Organize team structures</p>
+                                    </a>
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 mb-4">
-                            <div class="stat-card stat-card-dark h-100">
-                                <div class="card-body p-4">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <h6 class="text-uppercase text-muted small fw-bold mb-2">Active Teams</h6>
-                                            <h2 class="fw-bold text-dark mb-1 display-6"><%= stats && stats.totalTeams ? stats.totalTeams : 0 %></h2>
-                                            <span class="text-success small fw-bold">
-                                                <i class="fas fa-check me-1"></i>Active
-                                            </span>
-                                        </div>
-                                        <div class="stat-icon stat-icon-dark">
-                                            <i class="fas fa-sitemap"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-xxl-2 col-xl-3 col-lg-4 col-md-6 mb-4">
-                            <div class="stat-card stat-card-danger h-100">
-                                <div class="card-body p-4">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div class="flex-grow-1">
-                                            <h6 class="text-uppercase text-muted small fw-bold mb-2">Notifications</h6>
-                                            <h2 class="fw-bold text-dark mb-1 display-6"><%= stats && stats.pendingNotifications ? stats.pendingNotifications : 0 %></h2>
-                                            <span class="text-warning small fw-bold">
-                                                <i class="fas fa-bell me-1"></i>Unread
-                                            </span>
-                                        </div>
-                                        <div class="stat-icon stat-icon-danger">
+                                <div class="col-xxl-4 col-lg-6 col-md-6">
+                                    <a href="/admin/notifications" class="quick-action-btn text-center">
+                                        <div class="action-icon bg-dark bg-opacity-10 text-dark">
                                             <i class="fas fa-bell"></i>
                                         </div>
-                                    </div>
+                                        <h6 class="fw-bold mb-2">Notifications</h6>
+                                        <p class="text-muted small mb-0">View system alerts</p>
+                                    </a>
+                                </div>
+                                <div class="col-xxl-4 col-lg-6 col-md-6">
+                                    <a href="/admin/reports" class="quick-action-btn text-center">
+                                        <div class="action-icon bg-danger bg-opacity-10 text-danger">
+                                            <i class="fas fa-chart-bar"></i>
+                                        </div>
+                                        <h6 class="fw-bold mb-2">Reports</h6>
+                                        <p class="text-muted small mb-0">Access analytics</p>
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Quick Actions & System Info -->
-                    <div class="row">
-                        <!-- Quick Actions -->
-                        <div class="col-xl-8 col-lg-7 mb-4">
-                            <div class="card h-100">
-                                <div class="card-header d-flex align-items-center">
-                                    <i class="fas fa-bolt me-3 text-warning fs-5"></i>
-                                    <h5 class="card-title mb-0 fw-bold">Quick Actions</h5>
-                                </div>
-                                <div class="card-body p-4">
-                                    <div class="row g-3">
-                                        <div class="col-xxl-4 col-lg-6 col-md-6">
-                                            <a href="/admin/users/add" class="quick-action-btn text-center">
-                                                <div class="action-icon bg-primary bg-opacity-10 text-primary">
-                                                    <i class="fas fa-user-plus"></i>
-                                                </div>
-                                                <h6 class="fw-bold mb-2">Add User</h6>
-                                                <p class="text-muted small mb-0">Create new user account with roles</p>
-                                            </a>
-                                        </div>
-                                        <div class="col-xxl-4 col-lg-6 col-md-6">
-                                            <a href="/admin/budgets/create" class="quick-action-btn text-center">
-                                                <div class="action-icon bg-success bg-opacity-10 text-success">
-                                                    <i class="fas fa-wallet"></i>
-                                                </div>
-                                                <h6 class="fw-bold mb-2">Create Budget</h6>
-                                                <p class="text-muted small mb-0">Set up new budget allocation</p>
-                                            </a>
-                                        </div>
-                                        <div class="col-xxl-4 col-lg-6 col-md-6">
-                                            <a href="/admin/expenses" class="quick-action-btn text-center">
-                                                <div class="action-icon bg-warning bg-opacity-10 text-warning">
-                                                    <i class="fas fa-money-bill-wave"></i>
-                                                </div>
-                                                <h6 class="fw-bold mb-2">Manage Expenses</h6>
-                                                <p class="text-muted small mb-0">Review and approve expenses</p>
-                                            </a>
-                                        </div>
-                                        <div class="col-xxl-4 col-lg-6 col-md-6">
-                                            <a href="/admin/teams" class="quick-action-btn text-center">
-                                                <div class="action-icon bg-info bg-opacity-10 text-info">
-                                                    <i class="fas fa-users-cog"></i>
-                                                </div>
-                                                <h6 class="fw-bold mb-2">Manage Teams</h6>
-                                                <p class="text-muted small mb-0">Organize team structures</p>
-                                            </a>
-                                        </div>
-                                        <div class="col-xxl-4 col-lg-6 col-md-6">
-                                            <a href="/admin/notifications" class="quick-action-btn text-center">
-                                                <div class="action-icon bg-dark bg-opacity-10 text-dark">
-                                                    <i class="fas fa-bell"></i>
-                                                </div>
-                                                <h6 class="fw-bold mb-2">Notifications</h6>
-                                                <p class="text-muted small mb-0">View system alerts</p>
-                                            </a>
-                                        </div>
-                                        <div class="col-xxl-4 col-lg-6 col-md-6">
-                                            <a href="/admin/reports" class="quick-action-btn text-center">
-                                                <div class="action-icon bg-danger bg-opacity-10 text-danger">
-                                                    <i class="fas fa-chart-bar"></i>
-                                                </div>
-                                                <h6 class="fw-bold mb-2">Reports</h6>
-                                                <p class="text-muted small mb-0">Access analytics</p>
-                                            </a>
-                                        </div>
-                                    </div>
+                <!-- System Info -->
+                <div class="col-xl-4 col-lg-5 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center">
+                            <i class="fas fa-info-circle me-3 text-primary fs-5"></i>
+                            <h6 class="card-title mb-0 fw-bold">System Information</h6>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="system-status">
+                                <div class="status-dot status-online"></div>
+                                <div class="flex-grow-1">
+                                    <strong class="d-block mb-1">System Status</strong>
+                                    <span class="text-success">All Systems Operational</span>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- System Info -->
-                        <div class="col-xl-4 col-lg-5 mb-4">
-                            <div class="card h-100">
-                                <div class="card-header d-flex align-items-center">
-                                    <i class="fas fa-info-circle me-3 text-primary fs-5"></i>
-                                    <h6 class="card-title mb-0 fw-bold">System Information</h6>
+                            <div class="system-status">
+                                <i class="fas fa-database text-info fs-5"></i>
+                                <div class="flex-grow-1">
+                                    <strong class="d-block mb-1">Database</strong>
+                                    <span class="text-success">Connected & Healthy</span>
                                 </div>
-                                <div class="card-body p-4">
-                                    <div class="system-status">
-                                        <div class="status-dot status-online"></div>
-                                        <div class="flex-grow-1">
-                                            <strong class="d-block mb-1">System Status</strong>
-                                            <span class="text-success">All Systems Operational</span>
-                                        </div>
-                                    </div>
-                                    <div class="system-status">
-                                        <i class="fas fa-database text-info fs-5"></i>
-                                        <div class="flex-grow-1">
-                                            <strong class="d-block mb-1">Database</strong>
-                                            <span class="text-success">Connected & Healthy</span>
-                                        </div>
-                                    </div>
-                                    <div class="system-status">
-                                        <i class="fas fa-clock text-warning fs-5"></i>
-                                        <div class="flex-grow-1">
-                                            <strong class="d-block mb-1">Server Time</strong>
-                                            <span id="server-time" class="text-muted"><%= new Date().toLocaleString() %></span>
-                                        </div>
-                                    </div>
-                                    <div class="system-status">
-                                        <i class="fas fa-user-shield text-primary fs-5"></i>
-                                        <div class="flex-grow-1">
-                                            <strong class="d-block mb-1">Your Role</strong>
-                                            <span class="badge bg-primary"><%= user.role_name %></span>
-                                        </div>
-                                    </div>
-                                    <div class="system-status">
-                                        <i class="fas fa-sign-in-alt text-success fs-5"></i>
-                                        <div class="flex-grow-1">
-                                            <strong class="d-block mb-1">Last Login</strong>
-                                            <span class="text-muted">Recently</span>
-                                        </div>
-                                    </div>
+                            </div>
+                            <div class="system-status">
+                                <i class="fas fa-clock text-warning fs-5"></i>
+                                <div class="flex-grow-1">
+                                    <strong class="d-block mb-1">Server Time</strong>
+                                    <span id="server-time" class="text-muted"><%= new Date().toLocaleString() %></span>
+                                </div>
+                            </div>
+                            <div class="system-status">
+                                <i class="fas fa-user-shield text-primary fs-5"></i>
+                                <div class="flex-grow-1">
+                                    <strong class="d-block mb-1">Your Role</strong>
+                                    <span class="badge bg-primary"><%= user.role_name %></span>
+                                </div>
+                            </div>
+                            <div class="system-status">
+                                <i class="fas fa-sign-in-alt text-success fs-5"></i>
+                                <div class="flex-grow-1">
+                                    <strong class="d-block mb-1">Last Login</strong>
+                                    <span class="text-muted">Recently</span>
                                 </div>
                             </div>
                         </div>
@@ -912,31 +642,11 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div><!-- end fm-main -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const sidebar = document.getElementById('sidebar');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-            
-            // Mobile menu functionality
-            if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('mobile-open');
-                    sidebarOverlay.classList.toggle('active');
-                });
-            }
-
-            // Close sidebar when clicking overlay
-            if (sidebarOverlay) {
-                sidebarOverlay.addEventListener('click', function() {
-                    sidebar.classList.remove('mobile-open');
-                    sidebarOverlay.classList.remove('active');
-                });
-            }
-
             // Update server time every second
             function updateServerTime() {
                 const now = new Date();
@@ -961,14 +671,6 @@
             const statsCards = document.querySelectorAll('.stat-card');
             statsCards.forEach((card, index) => {
                 card.style.animationDelay = `${index * 0.1}s`;
-            });
-
-            // Handle window resize
-            window.addEventListener('resize', function() {
-                if (window.innerWidth > 992) {
-                    sidebar.classList.remove('mobile-open');
-                    sidebarOverlay.classList.remove('active');
-                }
             });
 
             // Auto-dismiss alerts after 5 seconds

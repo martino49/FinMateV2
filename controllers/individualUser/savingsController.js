@@ -57,7 +57,7 @@ const savingsController = {
       res.render('individualUser/savings/add', {
         title: 'Add Savings Goal - FinMate',
         user: req.user,
-        error: 'An error occurred while adding savings goal'
+        error: "Couldn't save your goal. Please try again."
       });
     }
   },
@@ -122,7 +122,7 @@ const savingsController = {
       console.error('Delete savings error:', error);
       
       if (req.xhr || req.headers.accept?.includes('application/json')) {
-        return res.status(500).json({ success: false, message: 'Error deleting savings goal' });
+        return res.status(500).json({ success: false, message: "Couldn't delete the goal. Please try again." });
       }
       
       res.redirect('/user/savings');
@@ -149,7 +149,7 @@ const savingsController = {
       console.error('Add to savings error:', error);
       
       if (req.xhr || req.headers.accept?.includes('application/json')) {
-        return res.status(500).json({ success: false, message: 'Error adding to savings' });
+        return res.status(500).json({ success: false, message: "Couldn't add to savings. Please try again." });
       }
       
       res.redirect('/user/savings');

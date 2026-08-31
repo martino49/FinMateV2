@@ -13,10 +13,9 @@ const dbConfig = {
   database: process.env.DB_NAME || (isProduction ? '' : 'finmate_local'),
   port: process.env.DB_PORT || 3306,
   waitForConnections: true,
-  connectionLimit: 5, // Reduced for serverless
+  connectionLimit: 10,
   queueLimit: 0,
-  connectTimeout: 5000,
-  acquireTimeout: 5000,
+  connectTimeout: 30000,
   // Only use SSL if CA path is provided or if explicitly requested
   ssl: (isProduction && process.env.DB_SSL === 'true') || (process.env.DB_CA_PATH && fs.existsSync(process.env.DB_CA_PATH))
     ? {
@@ -56,17 +55,21 @@ const execute = async (sql, params = []) => {
   }
 };
 
-// Test connection
-const testConnection = async () => {
-  try {
-    const connection = await pool.getConnection();
-    // console.log('Database connected successfully');
-    connection.release();
-    return true;
-  } catch (error) {
-    console.error('Database connection failed:', error.message);
-    return false;
+// Test connection with retry
+const testConnection = async (retries = 3) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const connection = await pool.getConnection();
+      connection.release();
+      return true;
+    } catch (error) {
+      console.error(`Database connection attempt ${i + 1}/${retries} failed:`, error.code || error.message || 'unknown');
+      if (i < retries - 1) {
+        await new Promise(r => setTimeout(r, 2000));
+      }
+    }
   }
+  return false;
 };
 
 // Initialize database tables
@@ -194,10 +197,10 @@ const initDatabase = async () => {
       user_id INT NOT NULL,
       title VARCHAR(255) NOT NULL,
       message TEXT NOT NULL,
-      type ENUM('info','warning','success','error') DEFAULT 'info',
+      type VARCHAR(50) DEFAULT 'info',
       is_read BOOLEAN DEFAULT FALSE,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (user_id) REFERENCES users(id)
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )`);
 
     // Incomes table
@@ -280,26 +283,20 @@ const initDatabase = async () => {
     )`);
 
     // === Add Missing Columns to Existing Tables ===
-    // Add status and team_id to expenses if missing
-    try {
-      await execute(`ALTER TABLE expenses ADD COLUMN status ENUM('pending','approved','rejected') DEFAULT 'pending' AFTER date`);
-    } catch { /* column exists */ }
-    try {
-      await execute(`ALTER TABLE expenses ADD COLUMN team_id INT NULL AFTER user_id`);
-    } catch { /* column exists */ }
+    const addColumnIfMissing = async (table, column, definition) => {
+      try {
+        const [cols] = await pool.execute(`SHOW COLUMNS FROM \`${table}\` LIKE ?`, [column]);
+        if (cols.length === 0) {
+          await execute(`ALTER TABLE \`${table}\` ADD COLUMN ${column} ${definition}`);
+        }
+      } catch { /* skip */ }
+    };
 
-    // Add planned_date and recurrence to planned_expenses if missing
-    try {
-      await execute(`ALTER TABLE planned_expenses ADD COLUMN planned_date DATE AFTER category`);
-    } catch { /* column exists */ }
-    try {
-      await execute(`ALTER TABLE planned_expenses ADD COLUMN recurrence ENUM('none','weekly','monthly','yearly') DEFAULT 'none' AFTER status`);
-    } catch { /* column exists */ }
-
-    // Add team_id to budgets if missing
-    try {
-      await execute(`ALTER TABLE budgets ADD COLUMN team_id INT NULL AFTER user_id`);
-    } catch { /* column exists */ }
+    await addColumnIfMissing('expenses', 'status', "ENUM('pending','approved','rejected') DEFAULT 'pending' AFTER date");
+    await addColumnIfMissing('expenses', 'team_id', 'INT NULL AFTER user_id');
+    await addColumnIfMissing('planned_expenses', 'planned_date', 'DATE AFTER category');
+    await addColumnIfMissing('planned_expenses', 'recurrence', "ENUM('none','weekly','monthly','yearly') DEFAULT 'none' AFTER status");
+    await addColumnIfMissing('budgets', 'team_id', 'INT NULL AFTER user_id');
 
     // === Default Data Section ===
     await execute(`INSERT IGNORE INTO roles (id,name,description) VALUES

@@ -44,7 +44,7 @@ const getExpenses = async (req, res) => {
       title: 'My Expenses',
       currentPage: 'expenses',
       user: req.user,
-      error: 'Failed to load expenses: ' + error.message
+      error: "Couldn't load your expenses right now. Please try again."
     });
   }
 };
@@ -87,7 +87,7 @@ const postAddExpense = async (req, res) => {
       title: 'Add Expense',
       currentPage: 'expenses',
       user: req.user,
-      error: 'Failed to add expense: ' + error.message
+      error: "Couldn't add the expense. Please try again."
     });
   }
 };

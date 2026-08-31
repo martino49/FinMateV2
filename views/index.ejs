@@ -18,8 +18,8 @@
             --ink-soft: #3a382f;
             --muted: #6b6559;
             --line: #d8d0bf;
-            --green: #1f6b3c;
-            --green-deep: #14472a;
+            --green: #0d9488;
+            --green-deep: #1e3a5f;
             --green-light: #e7efe6;
             --amber: #b98900;
             --red: #a3372c;
@@ -82,14 +82,18 @@
             letter-spacing: -0.02em;
         }
         .brand:hover { text-decoration: none; }
-        .brand-mark {
-            width: 30px; height: 30px;
-            border: 2px solid var(--ink);
-            border-radius: 50%;
+        .brand-icon {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, var(--green-deep), var(--green));
+            border-radius: 8px;
             display: grid; place-items: center;
-            font-family: 'Fraunces', serif;
-            font-weight: 900;
-            font-size: 0.95rem;
+            box-shadow: 0 2px 8px rgba(13, 148, 136, 0.3);
+        }
+        .brand-icon i {
+            font-size: 1rem;
+            color: white;
+        }
+        .brand-name {
             color: var(--green);
         }
         .nav-links { display: flex; align-items: center; gap: 26px; }
@@ -124,6 +128,19 @@
             border: 1px solid var(--ink);
         }
         .btn-outline:hover { background: var(--ink); color: var(--white); text-decoration: none; }
+
+        /* Money fly animation for buttons */
+        .btn.loading { pointer-events: none; opacity: 0.85; position: relative; }
+        .btn.loading .btn-text { opacity: 0; }
+        .btn .btn-loading { display: none; position: absolute; align-items: center; gap: 6px; }
+        .btn.loading .btn-loading { display: flex; }
+        .money-fly { display: inline-block; animation: moneyBounce 0.6s ease-in-out infinite; }
+        .money-fly:nth-child(2) { animation-delay: 0.1s; }
+        .money-fly:nth-child(3) { animation-delay: 0.2s; }
+        @keyframes moneyBounce {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 1; }
+            50% { transform: translateY(-6px) scale(1.15); opacity: 0.7; }
+        }
 
         /* Hero — asymmetric, left-aligned, no gradient */
         .hero {
@@ -383,7 +400,8 @@
         .page-footer { padding: 64px 0 40px; background: var(--ink); color: #8f8a7e; }
         .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; }
         .page-footer .brand { color: var(--white); margin-bottom: 14px; }
-        .page-footer .brand .brand-mark { border-color: var(--white); color: var(--amber); }
+        .page-footer .brand .brand-icon { box-shadow: none; }
+        .page-footer .brand .brand-name { color: var(--white); }
         .page-footer p.about { font-size: 0.9rem; max-width: 34ch; }
         .footer-col h5 { font-family: 'Public Sans', sans-serif; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.1em; color: #c8c4b8; margin-bottom: 16px; }
         .footer-col a { display: block; color: #8f8a7e; font-size: 0.9rem; padding: 5px 0; }
@@ -428,7 +446,8 @@
     <header class="page-header">
         <div class="header-inner">
             <a class="brand" href="/">
-                <span class="brand-mark">F</span> FinMate
+                <span class="brand-icon"><i class="fas fa-chart-line"></i></span>
+                <span class="brand-name">FinMate</span>
             </a>
             <nav class="nav-links">
                 <a href="#features">App</a>
@@ -453,7 +472,14 @@
                     seeing exactly what it's allowed to.
                 </p>
                 <div class="hero-actions">
-                    <a class="btn btn-ink" href="/auth/register">Create a free account</a>
+                    <a class="btn btn-ink" href="/auth/register" onclick="this.classList.add('loading'); return true;">
+                        <span class="btn-text">Create a free account</span>
+                        <span class="btn-loading">
+                            <span class="money-fly"><i class="fas fa-dollar-sign"></i></span>
+                            <span class="money-fly"><i class="fas fa-coins"></i></span>
+                            <span class="money-fly"><i class="fas fa-money-bill-wave"></i></span>
+                        </span>
+                    </a>
                     <a class="btn btn-outline" href="#features">See what's inside</a>
                 </div>
                 <div class="hero-rule">
@@ -776,7 +802,7 @@
         <div class="wrap">
             <div class="footer-grid">
                 <div>
-                    <a class="brand" href="/"><span class="brand-mark">F</span> FinMate</a>
+                    <a class="brand" href="/"><span class="brand-icon"><i class="fas fa-chart-line"></i></span> <span class="brand-name">FinMate</span></a>
                     <p class="about">A role-based financial management system for individuals and teams. Built and deployed by Martin Omolo (martino49).</p>
                 </div>
                 <div class="footer-col">

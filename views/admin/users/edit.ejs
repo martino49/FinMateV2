@@ -100,567 +100,575 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <%- include('../../partials/admin-sidebar') -%>
+    <%- include('../../partials/sidebar', { user: user, currentPage: 'users' }) %>
+    <div class="fm-main">
+        <nav class="fm-topbar">
+            <div class="fm-topbar-left">
+                <a class="fm-topbar-brand" href="/admin/dashboard">
+                    <span class="fm-topbar-brand-icon"><i class="fas fa-chart-line"></i></span>
+                    <span class="fm-topbar-brand-text">FinMate</span>
+                </a>
+                <button class="fm-topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <span class="fm-topbar-title">Edit User</span>
+            </div>
+            <div class="fm-topbar-right">
+                <a href="/admin/notifications"><i class="fas fa-bell"></i></a>
+                <a href="/auth/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </nav>
 
-            <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" style="margin-left: 280px;">
-                <!-- Header -->
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <div>
-                        <h1 class="h2">
-                            <i class="fas fa-user-edit me-2"></i>
-                            Edit User
-                        </h1>
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
-                                <li class="breadcrumb-item"><a href="/admin/users">User Management</a></li>
-                                <li class="breadcrumb-item active">Edit <%= userData.username %></li>
-                            </ol>
-                        </nav>
-                    </div>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <a href="/admin/users" class="btn btn-outline-secondary me-2">
-                            <i class="fas fa-arrow-left me-1"></i>
-                            Back to Users
-                        </a>
-                        <button type="submit" form="editUserForm" class="btn btn-primary">
-                            <i class="fas fa-save me-1"></i>
-                            Save Changes
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Success/Error Messages -->
-                <% if (locals.success) { %>
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="fas fa-check-circle me-2"></i>
-                        <%= locals.success %>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                <% } %>
-                
-                <% if (locals.error) { %>
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        <%= locals.error %>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                <% } %>
-
-                <div class="row">
-                    <!-- User Profile Sidebar -->
-                    <div class="col-md-4 mb-4">
-                        <div class="card user-info-card">
-                            <div class="card-body text-center">
-                                <div class="user-avatar-lg mb-3">
-                                    <i class="fas fa-user"></i>
-                                </div>
-                                <h4 class="card-title"><%= userData.first_name || 'No Name' %> <%= userData.last_name || '' %></h4>
-                                <p class="text-muted">@<%= userData.username %></p>
-                                
-                                <div class="d-flex justify-content-center mb-3">
-                                    <span class="badge <%= userData.is_active ? 'bg-success' : 'bg-danger' %> status-badge me-2">
-                                        <i class="fas fa-circle me-1"></i>
-                                        <%= userData.is_active ? 'Active' : 'Inactive' %>
-                                    </span>
-                                    <span class="badge bg-info status-badge">
-                                        <i class="fas fa-user-tag me-1"></i>
-                                        <%= userData.role_name || 'No Role' %>
-                                    </span>
-                                </div>
-
-                                <div class="row text-start mt-4">
-                                    <div class="col-12 mb-2">
-                                        <span class="info-label">Email:</span>
-                                        <div class="info-value"><%= userData.email %></div>
-                                    </div>
-                                    <div class="col-12 mb-2">
-                                        <span class="info-label">User ID:</span>
-                                        <div class="info-value">#<%= userData.id %></div>
-                                    </div>
-                                    <div class="col-12 mb-2">
-                                        <span class="info-label">Team:</span>
-                                        <div class="info-value">
-                                            <% if (userData.team_id) { %>
-                                                <%= userData.team_name || 'Team #' + userData.team_id %>
-                                            <% } else { %>
-                                                No Team
-                                            <% } %>
-                                        </div>
-                                    </div>
-                                    <div class="col-12 mb-2">
-                                        <span class="info-label">Member Since:</span>
-                                        <div class="info-value"><%= new Date(userData.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></div>
-                                    </div>
-                                    <div class="col-12 mb-2">
-                                        <span class="info-label">Last Updated:</span>
-                                        <div class="info-value"><%= new Date(userData.updated_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></div>
-                                    </div>
-                                </div>
-
-                                <!-- Quick Actions -->
-                                <div class="mt-4">
-                                    <div class="d-grid gap-2">
-                                        <a href="/admin/users/change-password/<%= userData.id %>" class="btn btn-info btn-sm">
-                                            <i class="fas fa-key me-1"></i>
-                                            Change Password
-                                        </a>
-                                        <a href="/admin/users/activity/<%= userData.id %>" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-chart-line me-1"></i>
-                                            View Activity
-                                        </a>
-                                        <% if (userData.is_active) { %>
-                                            <button class="btn btn-warning btn-sm" onclick="toggleUserStatus()">
-                                                <i class="fas fa-user-slash me-1"></i>
-                                                Deactivate User
-                                            </button>
-                                        <% } else { %>
-                                            <button class="btn btn-success btn-sm" onclick="toggleUserStatus()">
-                                                <i class="fas fa-user-check me-1"></i>
-                                                Activate User
-                                            </button>
-                                        <% } %>
-                                        <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
-                                            <i class="fas fa-trash me-1"></i>
-                                            Delete User
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- User Statistics -->
-                        <div class="card mt-4">
-                            <div class="card-header">
-                                <h6 class="card-title mb-0">
-                                    <i class="fas fa-chart-bar me-2"></i>
-                                    User Statistics
-                                </h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row text-center">
-                                    <div class="col-6 mb-3">
-                                        <div class="text-primary stat-card">
-                                            <i class="fas fa-receipt fa-2x mb-2"></i>
-                                            <h5><%= userAnalytics.expenses.total || 0 %></h5>
-                                            <small class="text-muted">Expenses</small>
-                                            <% if (userAnalytics.expenses.totalAmount > 0) { %>
-                                                <div class="small text-muted">$<%= parseFloat(userAnalytics.expenses.totalAmount).toFixed(2) %> total</div>
-                                            <% } %>
-                                        </div>
-                                    </div>
-                                    <div class="col-6 mb-3">
-                                        <div class="text-success stat-card">
-                                            <i class="fas fa-wallet fa-2x mb-2"></i>
-                                            <h5><%= userAnalytics.budgets.total || 0 %></h5>
-                                            <small class="text-muted">Budgets</small>
-                                            <% if (userAnalytics.budgets.totalAmount > 0) { %>
-                                                <div class="small text-muted">$<%= parseFloat(userAnalytics.budgets.totalAmount).toFixed(2) %> total</div>
-                                            <% } %>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="text-warning stat-card">
-                                            <i class="fas fa-piggy-bank fa-2x mb-2"></i>
-                                            <h5><%= userAnalytics.savings.total || 0 %></h5>
-                                            <small class="text-muted">Savings Goals</small>
-                                            <% if (userAnalytics.savings.totalSaved > 0) { %>
-                                                <div class="small text-muted">$<%= parseFloat(userAnalytics.savings.totalSaved).toFixed(2) %> saved</div>
-                                            <% } %>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="text-info stat-card">
-                                            <i class="fas fa-bell fa-2x mb-2"></i>
-                                            <h5><%= userAnalytics.notifications.total || 0 %></h5>
-                                            <small class="text-muted">Notifications</small>
-                                            <% if (userAnalytics.notifications.unread > 0) { %>
-                                                <div class="small text-danger"><%= userAnalytics.notifications.unread %> unread</div>
-                                            <% } %>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Quick Summary -->
-                        <div class="card mt-4">
-                            <div class="card-header">
-                                <h6 class="card-title mb-0">
-                                    <i class="fas fa-info-circle me-2"></i>
-                                    Quick Summary
-                                </h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row small">
-                                    <div class="col-12 mb-2">
-                                        <span class="info-label">Pending Expenses:</span>
-                                        <span class="info-value float-end"><%= userAnalytics.expenses.pending || 0 %></span>
-                                    </div>
-                                    <div class="col-12 mb-2">
-                                        <span class="info-label">Total Budgets:</span>
-                                        <span class="info-value float-end">$<%= parseFloat(userAnalytics.budgets.totalAmount || 0).toFixed(2) %></span>
-                                    </div>
-                                    <div class="col-12 mb-2">
-                                        <span class="info-label">Savings Progress:</span>
-                                        <span class="info-value float-end">
-                                            <% if (userAnalytics.savings.totalTarget > 0) { %>
-                                                <%= ((userAnalytics.savings.totalSaved / userAnalytics.savings.totalTarget) * 100).toFixed(1) %>%
-                                            <% } else { %>
-                                                0%
-                                            <% } %>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Main Edit Form -->
-                    <div class="col-md-8">
-                        <!-- Tabs Navigation -->
-                        <ul class="nav nav-tabs mb-4" id="userEditTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">
-                                    <i class="fas fa-user me-1"></i>
-                                    Profile Information
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">
-                                    <i class="fas fa-shield-alt me-1"></i>
-                                    Security
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab" aria-controls="activity" aria-selected="false">
-                                    <i class="fas fa-history me-1"></i>
-                                    Recent Activity
-                                </button>
-                            </li>
-                        </ul>
-
-                        <div class="tab-content" id="userEditTabsContent">
-                            <!-- Profile Information Tab -->
-                            <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
-                                <form id="editUserForm" action="/admin/users/edit/<%= userData.id %>" method="POST">
-                                    <div class="form-section">
-                                        <h5 class="mb-4">
-                                            <i class="fas fa-id-card me-2"></i>
-                                            Basic Information
-                                        </h5>
-                                        
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="username" class="form-label">Username *</label>
-                                                <input type="text" class="form-control" id="username" name="username" 
-                                                       value="<%= userData.username %>" required>
-                                                <div class="form-text">Unique identifier for the user</div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="email" class="form-label">Email Address *</label>
-                                                <input type="email" class="form-control" id="email" name="email" 
-                                                       value="<%= userData.email %>" required>
-                                                <div class="form-text">User's primary email address</div>
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="first_name" class="form-label">First Name</label>
-                                                <input type="text" class="form-control" id="first_name" name="first_name" 
-                                                       value="<%= userData.first_name || '' %>">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="last_name" class="form-label">Last Name</label>
-                                                <input type="text" class="form-control" id="last_name" name="last_name" 
-                                                       value="<%= userData.last_name || '' %>">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-section">
-                                        <h5 class="mb-4">
-                                            <i class="fas fa-users me-2"></i>
-                                            Role & Team Assignment
-                                        </h5>
-                                        
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="role_id" class="form-label">User Role *</label>
-                                                <select class="form-select" id="role_id" name="role_id" required>
-                                                    <option value="">Select a role...</option>
-                                                    <% roles.forEach(role => { %>
-                                                        <option value="<%= role.id %>" 
-                                                                <%= userData.role_id == role.id ? 'selected' : '' %>>
-                                                            <%= role.name %>
-                                                        </option>
-                                                    <% }); %>
-                                                </select>
-                                                <div class="form-text">Determines user permissions and access levels</div>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="team_id" class="form-label">Team Assignment</label>
-                                                <select class="form-select" id="team_id" name="team_id">
-                                                    <option value="">No Team</option>
-                                                    <% teams.forEach(team => { %>
-                                                        <option value="<%= team.id %>" 
-                                                                <%= userData.team_id == team.id ? 'selected' : '' %>>
-                                                            <%= team.name %>
-                                                        </option>
-                                                    <% }); %>
-                                                </select>
-                                                <div class="form-text">Assign user to a specific team (optional)</div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-section">
-                                        <h5 class="mb-4">
-                                            <i class="fas fa-toggle-on me-2"></i>
-                                            Account Status
-                                        </h5>
-                                        
-                                        <div class="mb-3">
-                                            <div class="form-check form-switch">
-                                                <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
-                                                       <%= userData.is_active ? 'checked' : '' %> value="1">
-                                                <label class="form-check-label" for="is_active">
-                                                    <strong>Active Account</strong>
-                                                </label>
-                                            </div>
-                                            <div class="form-text">
-                                                <% if (userData.is_active) { %>
-                                                    <span class="text-success">User can log in and access the system</span>
-                                                <% } else { %>
-                                                    <span class="text-danger">User account is deactivated and cannot log in</span>
-                                                <% } %>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Form Actions -->
-                                    <div class="d-flex justify-content-between align-items-center mt-4">
-                                        <a href="/admin/users" class="btn btn-outline-secondary">
-                                            <i class="fas fa-times me-1"></i>
-                                            Cancel
-                                        </a>
-                                        <div>
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="fas fa-save me-1"></i>
-                                                Save Changes
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-
-                            <!-- Security Tab -->
-                            <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
-                                <div class="form-section">
-                                    <h5 class="mb-4">
-                                        <i class="fas fa-shield-alt me-2"></i>
-                                        Security Management
-                                    </h5>
-                                    
-                                    <div class="row">
-                                        <div class="col-md-6 mb-4">
-                                            <div class="card security-card h-100">
-                                                <div class="card-body text-center">
-                                                    <div class="text-primary mb-3">
-                                                        <i class="fas fa-key fa-3x"></i>
-                                                    </div>
-                                                    <h5 class="card-title">Password Management</h5>
-                                                    <p class="card-text text-muted">
-                                                        Reset user password, generate temporary passwords, and manage password policies.
-                                                    </p>
-                                                    <a href="/admin/users/change-password/<%= userData.id %>" class="btn btn-primary">
-                                                        <i class="fas fa-key me-1"></i>
-                                                        Manage Password
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 mb-4">
-                                            <div class="card security-card h-100">
-                                                <div class="card-body text-center">
-                                                    <div class="text-warning mb-3">
-                                                        <i class="fas fa-user-shield fa-3x"></i>
-                                                    </div>
-                                                    <h5 class="card-title">Access Control</h5>
-                                                    <p class="card-text text-muted">
-                                                        Manage user permissions, role-based access, and security settings.
-                                                    </p>
-                                                    <button class="btn btn-outline-warning" onclick="showAccessControl()">
-                                                        <i class="fas fa-cog me-1"></i>
-                                                        Configure Access
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- Security Status -->
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h6 class="card-title mb-0">
-                                                <i class="fas fa-info-circle me-2"></i>
-                                                Security Status
-                                            </h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                                        <span>Account Status:</span>
-                                                        <span class="badge <%= userData.is_active ? 'bg-success' : 'bg-danger' %>">
-                                                            <%= userData.is_active ? 'Active' : 'Inactive' %>
-                                                        </span>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                                        <span>Last Password Change:</span>
-                                                        <span class="text-muted"><%= new Date(userData.updated_at).toLocaleDateString() %></span>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <span>User Role:</span>
-                                                        <span class="badge bg-info"><%= userData.role_name || 'No Role' %></span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                                        <span>Email Verified:</span>
-                                                        <span class="badge bg-success">Yes</span>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                                        <span>Two-Factor Auth:</span>
-                                                        <span class="badge bg-secondary">Not Enabled</span>
-                                                    </div>
-                                                    <div class="d-flex justify-content-between align-items-center">
-                                                        <span>Last Login:</span>
-                                                        <span class="text-muted">Recently</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Recent Activity Tab -->
-                            <div class="tab-pane fade" id="activity" role="tabpanel" aria-labelledby="activity-tab">
-                                <div class="form-section">
-                                    <h5 class="mb-4">
-                                        <i class="fas fa-history me-2"></i>
-                                        User Activity & Analytics
-                                    </h5>
-                                    
-                                    <div class="alert alert-info">
-                                        <i class="fas fa-info-circle me-2"></i>
-                                        For detailed activity tracking and comprehensive analytics, visit the dedicated activity page.
-                                    </div>
-
-                                    <div class="text-center py-4">
-                                        <a href="/admin/users/activity/<%= userData.id %>" class="btn btn-primary btn-lg">
-                                            <i class="fas fa-chart-line me-2"></i>
-                                            View Full Activity Report
-                                        </a>
-                                    </div>
-
-                                    <!-- Quick Activity Preview -->
-                                    <div class="card activity-preview-card">
-                                        <div class="card-header bg-light">
-                                            <h6 class="card-title mb-0">
-                                                <i class="fas fa-clock me-2"></i>
-                                                Recent Activity Preview
-                                            </h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="text-muted small mb-3">
-                                                Last 5 activities from this user:
-                                            </p>
-                                            <div id="quickActivityPreview">
-                                                <div class="text-center py-3">
-                                                    <i class="fas fa-spinner fa-spin text-muted me-2"></i>
-                                                    <span class="text-muted">Loading recent activity...</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-section">
-                                    <h5 class="mb-4">
-                                        <i class="fas fa-chart-line me-2"></i>
-                                        Financial Overview
-                                    </h5>
-                                    
-                                    <div class="table-responsive">
-                                        <table class="table table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>Type</th>
-                                                    <th>Description</th>
-                                                    <th>Amount</th>
-                                                    <th>Date</th>
-                                                    <th>Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <% if (userAnalytics.recentExpenses && userAnalytics.recentExpenses.length > 0) { %>
-                                                    <% userAnalytics.recentExpenses.slice(0, 5).forEach(expense => { %>
-                                                    <tr>
-                                                        <td>Expense</td>
-                                                        <td><%= expense.description %></td>
-                                                        <td>$<%= parseFloat(expense.amount).toFixed(2) %></td>
-                                                        <td><%= new Date(expense.date).toLocaleDateString() %></td>
-                                                        <td>
-                                                            <span class="badge bg-<%= expense.status === 'approved' ? 'success' : expense.status === 'pending' ? 'warning' : 'secondary' %>">
-                                                                <%= expense.status %>
-                                                            </span>
-                                                        </td>
-                                                    </tr>
-                                                    <% }); %>
-                                                <% } %>
-                                                <% if (userAnalytics.recentBudgets && userAnalytics.recentBudgets.length > 0) { %>
-                                                    <% userAnalytics.recentBudgets.slice(0, 3).forEach(budget => { %>
-                                                    <tr>
-                                                        <td>Budget</td>
-                                                        <td><%= budget.category %></td>
-                                                        <td>$<%= parseFloat(budget.amount).toFixed(2) %></td>
-                                                        <td><%= new Date().toLocaleDateString() %></td>
-                                                        <td><span class="badge bg-info">Active</span></td>
-                                                    </tr>
-                                                    <% }); %>
-                                                <% } %>
-                                                <% if ((!userAnalytics.recentExpenses || userAnalytics.recentExpenses.length === 0) && (!userAnalytics.recentBudgets || userAnalytics.recentBudgets.length === 0)) { %>
-                                                <tr>
-                                                    <td colspan="5" class="text-center text-muted py-3">
-                                                        No recent financial activity found
-                                                    </td>
-                                                </tr>
-                                                <% } %>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    
-                                    <div class="text-center mt-3">
-                                        <a href="/admin/users/activity/<%= userData.id %>" class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-external-link-alt me-1"></i>
-                                            View Complete Financial History
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
+        <!-- Header -->
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <div>
+                <h1 class="h2">
+                    <i class="fas fa-user-edit me-2"></i>
+                    Edit User
+                </h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="/admin/users">User Management</a></li>
+                        <li class="breadcrumb-item active">Edit <%= userData.username %></li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <a href="/admin/users" class="btn btn-outline-secondary me-2">
+                    <i class="fas fa-arrow-left me-1"></i>
+                    Back to Users
+                </a>
+                <button type="submit" form="editUserForm" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i>
+                    Save Changes
+                </button>
+            </div>
         </div>
-    </div>
+
+        <!-- Success/Error Messages -->
+        <% if (locals.success) { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <%= locals.success %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+        
+        <% if (locals.error) { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <%= locals.error %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+
+        <div class="row">
+            <!-- User Profile Sidebar -->
+            <div class="col-md-4 mb-4">
+                <div class="card user-info-card">
+                    <div class="card-body text-center">
+                        <div class="user-avatar-lg mb-3">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h4 class="card-title"><%= userData.first_name || 'No Name' %> <%= userData.last_name || '' %></h4>
+                        <p class="text-muted">@<%= userData.username %></p>
+                        
+                        <div class="d-flex justify-content-center mb-3">
+                            <span class="badge <%= userData.is_active ? 'bg-success' : 'bg-danger' %> status-badge me-2">
+                                <i class="fas fa-circle me-1"></i>
+                                <%= userData.is_active ? 'Active' : 'Inactive' %>
+                            </span>
+                            <span class="badge bg-info status-badge">
+                                <i class="fas fa-user-tag me-1"></i>
+                                <%= userData.role_name || 'No Role' %>
+                            </span>
+                        </div>
+
+                        <div class="row text-start mt-4">
+                            <div class="col-12 mb-2">
+                                <span class="info-label">Email:</span>
+                                <div class="info-value"><%= userData.email %></div>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <span class="info-label">User ID:</span>
+                                <div class="info-value">#<%= userData.id %></div>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <span class="info-label">Team:</span>
+                                <div class="info-value">
+                                    <% if (userData.team_id) { %>
+                                        <%= userData.team_name || 'Team #' + userData.team_id %>
+                                    <% } else { %>
+                                        No Team
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <span class="info-label">Member Since:</span>
+                                <div class="info-value"><%= new Date(userData.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></div>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <span class="info-label">Last Updated:</span>
+                                <div class="info-value"><%= new Date(userData.updated_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %></div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="mt-4">
+                            <div class="d-grid gap-2">
+                                <a href="/admin/users/change-password/<%= userData.id %>" class="btn btn-info btn-sm">
+                                    <i class="fas fa-key me-1"></i>
+                                    Change Password
+                                </a>
+                                <a href="/admin/users/activity/<%= userData.id %>" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-chart-line me-1"></i>
+                                    View Activity
+                                </a>
+                                <% if (userData.is_active) { %>
+                                    <button class="btn btn-warning btn-sm" onclick="toggleUserStatus()">
+                                        <i class="fas fa-user-slash me-1"></i>
+                                        Deactivate User
+                                    </button>
+                                <% } else { %>
+                                    <button class="btn btn-success btn-sm" onclick="toggleUserStatus()">
+                                        <i class="fas fa-user-check me-1"></i>
+                                        Activate User
+                                    </button>
+                                <% } %>
+                                <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteUserModal">
+                                    <i class="fas fa-trash me-1"></i>
+                                    Delete User
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- User Statistics -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            User Statistics
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <div class="text-primary stat-card">
+                                    <i class="fas fa-receipt fa-2x mb-2"></i>
+                                    <h5><%= userAnalytics.expenses.total || 0 %></h5>
+                                    <small class="text-muted">Expenses</small>
+                                    <% if (userAnalytics.expenses.totalAmount > 0) { %>
+                                        <div class="small text-muted">$<%= parseFloat(userAnalytics.expenses.totalAmount).toFixed(2) %> total</div>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="text-success stat-card">
+                                    <i class="fas fa-wallet fa-2x mb-2"></i>
+                                    <h5><%= userAnalytics.budgets.total || 0 %></h5>
+                                    <small class="text-muted">Budgets</small>
+                                    <% if (userAnalytics.budgets.totalAmount > 0) { %>
+                                        <div class="small text-muted">$<%= parseFloat(userAnalytics.budgets.totalAmount).toFixed(2) %> total</div>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-warning stat-card">
+                                    <i class="fas fa-piggy-bank fa-2x mb-2"></i>
+                                    <h5><%= userAnalytics.savings.total || 0 %></h5>
+                                    <small class="text-muted">Savings Goals</small>
+                                    <% if (userAnalytics.savings.totalSaved > 0) { %>
+                                        <div class="small text-muted">$<%= parseFloat(userAnalytics.savings.totalSaved).toFixed(2) %> saved</div>
+                                    <% } %>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-info stat-card">
+                                    <i class="fas fa-bell fa-2x mb-2"></i>
+                                    <h5><%= userAnalytics.notifications.total || 0 %></h5>
+                                    <small class="text-muted">Notifications</small>
+                                    <% if (userAnalytics.notifications.unread > 0) { %>
+                                        <div class="small text-danger"><%= userAnalytics.notifications.unread %> unread</div>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Summary -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Quick Summary
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row small">
+                            <div class="col-12 mb-2">
+                                <span class="info-label">Pending Expenses:</span>
+                                <span class="info-value float-end"><%= userAnalytics.expenses.pending || 0 %></span>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <span class="info-label">Total Budgets:</span>
+                                <span class="info-value float-end">$<%= parseFloat(userAnalytics.budgets.totalAmount || 0).toFixed(2) %></span>
+                            </div>
+                            <div class="col-12 mb-2">
+                                <span class="info-label">Savings Progress:</span>
+                                <span class="info-value float-end">
+                                    <% if (userAnalytics.savings.totalTarget > 0) { %>
+                                        <%= ((userAnalytics.savings.totalSaved / userAnalytics.savings.totalTarget) * 100).toFixed(1) %>%
+                                    <% } else { %>
+                                        0%
+                                    <% } %>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Edit Form -->
+            <div class="col-md-8">
+                <!-- Tabs Navigation -->
+                <ul class="nav nav-tabs mb-4" id="userEditTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="true">
+                            <i class="fas fa-user me-1"></i>
+                            Profile Information
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            Security
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab" aria-controls="activity" aria-selected="false">
+                            <i class="fas fa-history me-1"></i>
+                            Recent Activity
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="userEditTabsContent">
+                    <!-- Profile Information Tab -->
+                    <div class="tab-pane fade show active" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                        <form id="editUserForm" action="/admin/users/edit/<%= userData.id %>" method="POST">
+                            <div class="form-section">
+                                <h5 class="mb-4">
+                                    <i class="fas fa-id-card me-2"></i>
+                                    Basic Information
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="username" class="form-label">Username *</label>
+                                        <input type="text" class="form-control" id="username" name="username" 
+                                               value="<%= userData.username %>" required>
+                                        <div class="form-text">Unique identifier for the user</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="email" class="form-label">Email Address *</label>
+                                        <input type="email" class="form-control" id="email" name="email" 
+                                               value="<%= userData.email %>" required>
+                                        <div class="form-text">User's primary email address</div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="first_name" class="form-label">First Name</label>
+                                        <input type="text" class="form-control" id="first_name" name="first_name" 
+                                               value="<%= userData.first_name || '' %>">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="last_name" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" id="last_name" name="last_name" 
+                                               value="<%= userData.last_name || '' %>">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h5 class="mb-4">
+                                    <i class="fas fa-users me-2"></i>
+                                    Role & Team Assignment
+                                </h5>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="role_id" class="form-label">User Role *</label>
+                                        <select class="form-select" id="role_id" name="role_id" required>
+                                            <option value="">Select a role...</option>
+                                            <% roles.forEach(role => { %>
+                                                <option value="<%= role.id %>" 
+                                                        <%= userData.role_id == role.id ? 'selected' : '' %>>
+                                                    <%= role.name %>
+                                                </option>
+                                            <% }); %>
+                                        </select>
+                                        <div class="form-text">Determines user permissions and access levels</div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="team_id" class="form-label">Team Assignment</label>
+                                        <select class="form-select" id="team_id" name="team_id">
+                                            <option value="">No Team</option>
+                                            <% teams.forEach(team => { %>
+                                                <option value="<%= team.id %>" 
+                                                        <%= userData.team_id == team.id ? 'selected' : '' %>>
+                                                    <%= team.name %>
+                                                </option>
+                                            <% }); %>
+                                        </select>
+                                        <div class="form-text">Assign user to a specific team (optional)</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h5 class="mb-4">
+                                    <i class="fas fa-toggle-on me-2"></i>
+                                    Account Status
+                                </h5>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
+                                               <%= userData.is_active ? 'checked' : '' %> value="1">
+                                        <label class="form-check-label" for="is_active">
+                                            <strong>Active Account</strong>
+                                        </label>
+                                    </div>
+                                    <div class="form-text">
+                                        <% if (userData.is_active) { %>
+                                            <span class="text-success">User can log in and access the system</span>
+                                        <% } else { %>
+                                            <span class="text-danger">User account is deactivated and cannot log in</span>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <a href="/admin/users" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times me-1"></i>
+                                    Cancel
+                                </a>
+                                <div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i>
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Security Tab -->
+                    <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
+                        <div class="form-section">
+                            <h5 class="mb-4">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Security Management
+                            </h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card security-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="text-primary mb-3">
+                                                <i class="fas fa-key fa-3x"></i>
+                                            </div>
+                                            <h5 class="card-title">Password Management</h5>
+                                            <p class="card-text text-muted">
+                                                Reset user password, generate temporary passwords, and manage password policies.
+                                            </p>
+                                            <a href="/admin/users/change-password/<%= userData.id %>" class="btn btn-primary">
+                                                <i class="fas fa-key me-1"></i>
+                                                Manage Password
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="card security-card h-100">
+                                        <div class="card-body text-center">
+                                            <div class="text-warning mb-3">
+                                                <i class="fas fa-user-shield fa-3x"></i>
+                                            </div>
+                                            <h5 class="card-title">Access Control</h5>
+                                            <p class="card-text text-muted">
+                                                Manage user permissions, role-based access, and security settings.
+                                            </p>
+                                            <button class="btn btn-outline-warning" onclick="showAccessControl()">
+                                                <i class="fas fa-cog me-1"></i>
+                                                Configure Access
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Security Status -->
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Security Status
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <span>Account Status:</span>
+                                                <span class="badge <%= userData.is_active ? 'bg-success' : 'bg-danger' %>">
+                                                    <%= userData.is_active ? 'Active' : 'Inactive' %>
+                                                </span>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <span>Last Password Change:</span>
+                                                <span class="text-muted"><%= new Date(userData.updated_at).toLocaleDateString() %></span>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>User Role:</span>
+                                                <span class="badge bg-info"><%= userData.role_name || 'No Role' %></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <span>Email Verified:</span>
+                                                <span class="badge bg-success">Yes</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                                <span>Two-Factor Auth:</span>
+                                                <span class="badge bg-secondary">Not Enabled</span>
+                                            </div>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>Last Login:</span>
+                                                <span class="text-muted">Recently</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity Tab -->
+                    <div class="tab-pane fade" id="activity" role="tabpanel" aria-labelledby="activity-tab">
+                        <div class="form-section">
+                            <h5 class="mb-4">
+                                <i class="fas fa-history me-2"></i>
+                                User Activity & Analytics
+                            </h5>
+                            
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                For detailed activity tracking and comprehensive analytics, visit the dedicated activity page.
+                            </div>
+
+                            <div class="text-center py-4">
+                                <a href="/admin/users/activity/<%= userData.id %>" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-chart-line me-2"></i>
+                                    View Full Activity Report
+                                </a>
+                            </div>
+
+                            <!-- Quick Activity Preview -->
+                            <div class="card activity-preview-card">
+                                <div class="card-header bg-light">
+                                    <h6 class="card-title mb-0">
+                                        <i class="fas fa-clock me-2"></i>
+                                        Recent Activity Preview
+                                    </h6>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted small mb-3">
+                                        Last 5 activities from this user:
+                                    </p>
+                                    <div id="quickActivityPreview">
+                                        <div class="text-center py-3">
+                                            <i class="fas fa-spinner fa-spin text-muted me-2"></i>
+                                            <span class="text-muted">Loading recent activity...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h5 class="mb-4">
+                                <i class="fas fa-chart-line me-2"></i>
+                                Financial Overview
+                            </h5>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th>Amount</th>
+                                            <th>Date</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (userAnalytics.recentExpenses && userAnalytics.recentExpenses.length > 0) { %>
+                                            <% userAnalytics.recentExpenses.slice(0, 5).forEach(expense => { %>
+                                            <tr>
+                                                <td>Expense</td>
+                                                <td><%= expense.description %></td>
+                                                <td>$<%= parseFloat(expense.amount).toFixed(2) %></td>
+                                                <td><%= new Date(expense.date).toLocaleDateString() %></td>
+                                                <td>
+                                                    <span class="badge bg-<%= expense.status === 'approved' ? 'success' : expense.status === 'pending' ? 'warning' : 'secondary' %>">
+                                                        <%= expense.status %>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <% }); %>
+                                        <% } %>
+                                        <% if (userAnalytics.recentBudgets && userAnalytics.recentBudgets.length > 0) { %>
+                                            <% userAnalytics.recentBudgets.slice(0, 3).forEach(budget => { %>
+                                            <tr>
+                                                <td>Budget</td>
+                                                <td><%= budget.category %></td>
+                                                <td>$<%= parseFloat(budget.amount).toFixed(2) %></td>
+                                                <td><%= new Date().toLocaleDateString() %></td>
+                                                <td><span class="badge bg-info">Active</span></td>
+                                            </tr>
+                                            <% }); %>
+                                        <% } %>
+                                        <% if ((!userAnalytics.recentExpenses || userAnalytics.recentExpenses.length === 0) && (!userAnalytics.recentBudgets || userAnalytics.recentBudgets.length === 0)) { %>
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted py-3">
+                                                No recent financial activity found
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="text-center mt-3">
+                                <a href="/admin/users/activity/<%= userData.id %>" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-external-link-alt me-1"></i>
+                                    View Complete Financial History
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- end fm-main -->
 
     <!-- Delete User Confirmation Modal -->
     <div class="modal fade" id="deleteUserModal" tabindex="-1">

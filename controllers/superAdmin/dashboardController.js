@@ -7,8 +7,8 @@ const dashboardController = {
       // Get basic stats
       const [userCount] = await db.pool.execute('SELECT COUNT(*) as count FROM users WHERE is_active = TRUE');
       const [roleCount] = await db.pool.execute('SELECT COUNT(*) as count FROM roles');
-      const [teamCount] = await db.pool.execute('SELECT COUNT(*) as count FROM teams WHERE is_active = TRUE');
-      const [expenseCount] = await db.pool.execute('SELECT COUNT(*) as count FROM expenses WHERE is_active = TRUE');
+      const [teamCount] = await db.pool.execute('SELECT COUNT(*) as count FROM teams');
+      const [expenseCount] = await db.pool.execute('SELECT COUNT(*) as count FROM expenses');
 
       // Get recent users (required by template)
       const [recentUsers] = await db.pool.execute(

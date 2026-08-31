@@ -9,147 +9,115 @@
     <link href="/css/admin.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <%- include('../partials/admin-sidebar') %>
+    <%- include('../partials/sidebar', { user: user, currentPage: 'expenses' }) %>
+    <div class="fm-main">
+        <nav class="fm-topbar">
+            <div class="fm-topbar-left">
+                <a class="fm-topbar-brand" href="/admin/dashboard">
+                    <span class="fm-topbar-brand-icon"><i class="fas fa-chart-line"></i></span>
+                    <span class="fm-topbar-brand-text">FinMate</span>
+                </a>
+                <button class="fm-topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <span class="fm-topbar-title">Manage Expenses</span>
+            </div>
+            <div class="fm-topbar-right">
+                <a href="/admin/notifications"><i class="fas fa-bell"></i></a>
+                <a href="/auth/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </nav>
 
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Manage Expenses</h1>
-                    <a href="/admin/expenses/add" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i>Add Expense
-                    </a>
-                </div>
-
-                <div class="card shadow">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>User/Team</th>
-                                        <th>Amount</th>
-                                        <th>Description</th>
-                                        <th>Category</th>
-                                        <th>Date</th>
-                                        <th>Status</th>
-                                        <th>Created</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% expenses.forEach(expense => { %>
-                                        <tr>
-                                            <td>
-                                                <% if (expense.team_name) { %>
-                                                    <span class="badge bg-info">Team: <%= expense.team_name %></span><br>
-                                                <% } %>
-                                                <%= expense.first_name %> <%= expense.last_name %>
-                                            </td>
-                                            <td>$<%= expense.amount %></td>
-                                            <td><%= expense.description %></td>
-                                            <td><%= expense.category %></td>
-                                            <td><%= new Date(expense.date).toLocaleDateString() %></td>
-                                            <td>
-                                                <span class="badge bg-<%= expense.status === 'approved' ? 'success' : expense.status === 'rejected' ? 'danger' : 'warning' %>">
-                                                    <%= expense.status %>
-                                                </span>
-                                            </td>
-                                            <td><%= new Date(expense.created_at).toLocaleDateString() %></td>
-                                            <td>
-                                                <a href="/admin/expenses/edit/<%= expense.id %>" class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <% if (expense.status === 'pending') { %>
-                                                    <button onclick="approveExpense(<%= expense.id %>)" class="btn btn-sm btn-outline-success">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                    <button onclick="rejectExpense(<%= expense.id %>)" class="btn btn-sm btn-outline-danger">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                <% } %>
-                                                <button onclick="deleteExpense(<%= expense.id %>)" class="btn btn-sm btn-outline-danger">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    <% }); %>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </main>
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Manage Expenses</h1>
+            <a href="/admin/expenses/add" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add Expense
+            </a>
         </div>
-    </div>
+
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th>User/Team</th>
+                                <th>Amount</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% expenses.forEach(expense => { %>
+                                <tr>
+                                    <td>
+                                        <% if (expense.team_name) { %>
+                                            <span class="badge bg-info">Team: <%= expense.team_name %></span><br>
+                                        <% } %>
+                                        <%= expense.first_name %> <%= expense.last_name %>
+                                    </td>
+                                    <td>$<%= expense.amount %></td>
+                                    <td><%= expense.description %></td>
+                                    <td><%= expense.category %></td>
+                                    <td><%= new Date(expense.date).toLocaleDateString() %></td>
+                                    <td>
+                                        <span class="badge bg-<%= expense.status === 'approved' ? 'success' : expense.status === 'rejected' ? 'danger' : 'warning' %>">
+                                            <%= expense.status %>
+                                        </span>
+                                    </td>
+                                    <td><%= new Date(expense.created_at).toLocaleDateString() %></td>
+                                    <td>
+                                        <a href="/admin/expenses/edit/<%= expense.id %>" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <% if (expense.status === 'pending') { %>
+                                            <button onclick="approveExpense(<%= expense.id %>)" class="btn btn-sm btn-outline-success">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button onclick="rejectExpense(<%= expense.id %>)" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        <% } %>
+                                        <button onclick="deleteExpense(<%= expense.id %>)" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div><!-- end fm-main -->
 
     <script>
         function approveExpense(expenseId) {
             if (confirm('Are you sure you want to approve this expense?')) {
-                fetch(`/admin/expenses/approve/${expenseId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                })
+                fetch(`/admin/expenses/approve/${expenseId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
                 .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Error approving expense');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error approving expense');
-                });
+                .then(data => { if (data.success) location.reload(); else alert('Error approving expense'); })
+                .catch(error => { console.error('Error:', error); alert('Error approving expense'); });
             }
         }
 
         function rejectExpense(expenseId) {
             if (confirm('Are you sure you want to reject this expense?')) {
-                fetch(`/admin/expenses/reject/${expenseId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                })
+                fetch(`/admin/expenses/reject/${expenseId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
                 .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Error rejecting expense');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error rejecting expense');
-                });
+                .then(data => { if (data.success) location.reload(); else alert('Error rejecting expense'); })
+                .catch(error => { console.error('Error:', error); alert('Error rejecting expense'); });
             }
         }
 
         function deleteExpense(expenseId) {
             if (confirm('Are you sure you want to delete this expense?')) {
-                fetch(`/admin/expenses/delete/${expenseId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                })
+                fetch(`/admin/expenses/delete/${expenseId}`, { method: 'POST', headers: { 'Content-Type': 'application/json' } })
                 .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        location.reload();
-                    } else {
-                        alert('Error deleting expense');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Error deleting expense');
-                });
+                .then(data => { if (data.success) location.reload(); else alert('Error deleting expense'); })
+                .catch(error => { console.error('Error:', error); alert('Error deleting expense'); });
             }
         }
     </script>

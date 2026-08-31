@@ -7,366 +7,326 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        .sidebar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        .sidebar .nav-link {
-            color: #fff;
-            padding: 12px 20px;
-            margin: 4px 0;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
-            background: rgba(255,255,255,0.2);
-        }
         .period-daily { background-color: #17a2b8; }
         .period-weekly { background-color: #28a745; }
         .period-monthly { background-color: #007bff; }
         .period-yearly { background-color: #6f42c1; }
-        
-        /* Budget progress bars */
-        .progress {
-            height: 8px;
-            margin-top: 5px;
-        }
-        
-        /* Budget status indicators */
-        .budget-status {
-            font-size: 0.75rem;
-            padding: 3px 8px;
-            border-radius: 12px;
-        }
+        .progress { height: 8px; margin-top: 5px; }
+        .budget-status { font-size: 0.75rem; padding: 3px 8px; border-radius: 12px; }
         .status-on-track { background-color: #d4edda; color: #155724; }
         .status-warning { background-color: #fff3cd; color: #856404; }
         .status-exceeded { background-color: #f8d7da; color: #721c24; }
-        
-        /* Budget usage indicators */
         .usage-low { border-left: 4px solid #28a745; }
         .usage-medium { border-left: 4px solid #ffc107; }
         .usage-high { border-left: 4px solid #dc3545; }
-        
-        /* Filter section */
-        .filter-section {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        
-        /* Quick stats cards */
-        .stat-card {
-            border-radius: 10px;
-            transition: transform 0.2s;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        /* Budget chart */
-        .budget-chart {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
+        .filter-section { background-color: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        .stat-card { border-radius: 10px; transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .budget-chart { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            
-            <%- include('../../partials/admin-sidebar') -%>
-            <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">
-                        <i class="fas fa-wallet me-2 text-primary"></i>
-                        Budget Management
-                    </h1>
-                    <div class="btn-toolbar mb-2 mb-md-0">
+    <%- include('../../partials/sidebar', { user: user, currentPage: 'budgets' }) %>
+    <div class="fm-main">
+        <nav class="fm-topbar">
+            <div class="fm-topbar-left">
+                <a class="fm-topbar-brand" href="/admin/dashboard">
+                    <span class="fm-topbar-brand-icon"><i class="fas fa-chart-line"></i></span>
+                    <span class="fm-topbar-brand-text">FinMate</span>
+                </a>
+                <button class="fm-topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <span class="fm-topbar-title">Budget Management</span>
+            </div>
+            <div class="fm-topbar-right">
+                <a href="/admin/notifications"><i class="fas fa-bell"></i></a>
+                <a href="/auth/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </nav>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">
+                <i class="fas fa-wallet me-2 text-primary"></i>
+                Budget Management
+            </h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <a href="/admin/budgets/create" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Create Budget
+                </a>
+            </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        <% if (locals.query && locals.query.success) { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>
+                <%= locals.query.success %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+
+        <% if (locals.query && locals.query.error) { %>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <%= locals.query.error %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+
+        <!-- Budget Statistics -->
+        <% if (locals.budgets && locals.budgets.length > 0) { %>
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stat-card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 class="card-title"><%= locals.budgets.length %></h4>
+                                <p class="card-text">Total Budgets</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-wallet fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <%
+                                    let totalAmount = 0;
+                                    locals.budgets.forEach(budget => {
+                                        totalAmount += parseFloat(budget.amount);
+                                    });
+                                %>
+                                <h4 class="card-title">$<%= totalAmount.toFixed(2) %></h4>
+                                <p class="card-text">Total Budget Amount</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-dollar-sign fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card bg-info text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <%
+                                    let monthlyBudgets = 0;
+                                    locals.budgets.forEach(budget => {
+                                        if (budget.period === 'Monthly') monthlyBudgets++;
+                                    });
+                                %>
+                                <h4 class="card-title"><%= monthlyBudgets %></h4>
+                                <p class="card-text">Monthly Budgets</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-calendar-alt fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <%
+                                    let activeUsers = new Set();
+                                    locals.budgets.forEach(budget => {
+                                        if (budget.user_name) activeUsers.add(budget.user_name);
+                                    });
+                                %>
+                                <h4 class="card-title"><%= activeUsers.size %></h4>
+                                <p class="card-text">Active Users</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } %>
+
+        <!-- Filters -->
+        <div class="filter-section">
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="periodFilter" class="form-label">Filter by Period</label>
+                    <select class="form-select" id="periodFilter">
+                        <option value="">All Periods</option>
+                        <option value="Daily">Daily</option>
+                        <option value="Weekly">Weekly</option>
+                        <option value="Monthly">Monthly</option>
+                        <option value="Yearly">Yearly</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="userFilter" class="form-label">Filter by User</label>
+                    <select class="form-select" id="userFilter">
+                        <option value="">All Users</option>
+                        <% if (locals.budgets) { 
+                            let users = new Set();
+                            locals.budgets.forEach(budget => {
+                                if (budget.user_name) users.add(budget.user_name);
+                            });
+                            users.forEach(user => { %>
+                                <option value="<%= user %>"><%= user %></option>
+                            <% });
+                        } %>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="teamFilter" class="form-label">Filter by Team</label>
+                    <select class="form-select" id="teamFilter">
+                        <option value="">All Teams</option>
+                        <% if (locals.budgets) { 
+                            let teams = new Set();
+                            locals.budgets.forEach(budget => {
+                                if (budget.team_name) teams.add(budget.team_name);
+                            });
+                            teams.forEach(team => { %>
+                                <option value="<%= team %>"><%= team %></option>
+                            <% });
+                        } %>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button class="btn btn-outline-secondary w-100" id="resetFilters">
+                        <i class="fas fa-redo me-1"></i>Reset Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Budgets Table -->
+        <div class="card shadow">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>All Budgets
+                    <% if (locals.budgets && locals.budgets.length > 0) { %>
+                        <span class="badge bg-primary ms-2"><%= locals.budgets.length %> budgets</span>
+                    <% } %>
+                </h5>
+                <div class="text-muted small">
+                    Showing all active budgets
+                </div>
+            </div>
+            <div class="card-body">
+                <% if (locals.budgets && locals.budgets.length > 0) { %>
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="budgetsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                    <th>Period</th>
+                                    <th>User</th>
+                                    <th>Team</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% locals.budgets.forEach(budget => { %>
+                                    <tr class="budget-row" 
+                                        data-period="<%= budget.period %>"
+                                        data-user="<%= budget.user_name || '' %>"
+                                        data-team="<%= budget.team_name || '' %>">
+                                        <td><strong>#<%= budget.id %></strong></td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-folder text-primary me-2"></i>
+                                                <span class="fw-bold"><%= budget.category %></span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold text-success">
+                                                $<%= parseFloat(budget.amount).toFixed(2) %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge period-<%= budget.period ? budget.period.toLowerCase() : 'monthly' %>">
+                                                <i class="fas fa-<%= 
+                                                    budget.period === 'Daily' ? 'calendar-day' : 
+                                                    budget.period === 'Weekly' ? 'calendar-week' :
+                                                    budget.period === 'Yearly' ? 'calendar-year' : 
+                                                    'calendar-alt' 
+                                                %> me-1"></i>
+                                                <%= budget.period %>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-user text-muted me-2"></i>
+                                                <span><%= budget.user_name || 'N/A' %></span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-users text-muted me-2"></i>
+                                                <span><%= budget.team_name || 'N/A' %></span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                <%= budget.start_date ? new Date(budget.start_date).toLocaleDateString() : 'N/A' %>
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                <%= budget.end_date ? new Date(budget.end_date).toLocaleDateString() : 'N/A' %>
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="/admin/budgets/edit/<%= budget.id %>" class="btn btn-outline-primary" title="Edit Budget">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form action="/admin/budgets/delete/<%= budget.id %>" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this budget?');">
+                                                    <button type="submit" class="btn btn-outline-danger" title="Delete Budget">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                <% } else { %>
+                    <div class="text-center py-5">
+                        <i class="fas fa-wallet fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Budgets Found</h5>
+                        <p class="text-muted">There are no budgets in the system yet.</p>
                         <a href="/admin/budgets/create" class="btn btn-primary">
-                            <i class="fas fa-plus me-1"></i>Create Budget
+                            <i class="fas fa-plus me-1"></i>Create First Budget
                         </a>
                     </div>
-                </div>
-
-                <!-- Success/Error Messages -->
-                <% if (locals.query && locals.query.success) { %>
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        <i class="fas fa-check-circle me-2"></i>
-                        <%= locals.query.success %>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
                 <% } %>
-
-                <% if (locals.query && locals.query.error) { %>
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        <i class="fas fa-exclamation-circle me-2"></i>
-                        <%= locals.query.error %>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                <% } %>
-
-                <!-- Budget Statistics -->
-                <% if (locals.budgets && locals.budgets.length > 0) { %>
-                <div class="row mb-4">
-                    <div class="col-md-3">
-                        <div class="card stat-card bg-primary text-white">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <h4 class="card-title"><%= locals.budgets.length %></h4>
-                                        <p class="card-text">Total Budgets</p>
-                                    </div>
-                                    <div class="align-self-center">
-                                        <i class="fas fa-wallet fa-2x"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card stat-card bg-success text-white">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <%
-                                            let totalAmount = 0;
-                                            locals.budgets.forEach(budget => {
-                                                totalAmount += parseFloat(budget.amount);
-                                            });
-                                        %>
-                                        <h4 class="card-title">$<%= totalAmount.toFixed(2) %></h4>
-                                        <p class="card-text">Total Budget Amount</p>
-                                    </div>
-                                    <div class="align-self-center">
-                                        <i class="fas fa-dollar-sign fa-2x"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card stat-card bg-info text-white">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <%
-                                            let monthlyBudgets = 0;
-                                            locals.budgets.forEach(budget => {
-                                                if (budget.period === 'Monthly') monthlyBudgets++;
-                                            });
-                                        %>
-                                        <h4 class="card-title"><%= monthlyBudgets %></h4>
-                                        <p class="card-text">Monthly Budgets</p>
-                                    </div>
-                                    <div class="align-self-center">
-                                        <i class="fas fa-calendar-alt fa-2x"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card stat-card bg-warning text-white">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between">
-                                    <div>
-                                        <%
-                                            let activeUsers = new Set();
-                                            locals.budgets.forEach(budget => {
-                                                if (budget.user_name) activeUsers.add(budget.user_name);
-                                            });
-                                        %>
-                                        <h4 class="card-title"><%= activeUsers.size %></h4>
-                                        <p class="card-text">Active Users</p>
-                                    </div>
-                                    <div class="align-self-center">
-                                        <i class="fas fa-users fa-2x"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <% } %>
-
-                <!-- Filters -->
-                <div class="filter-section">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label for="periodFilter" class="form-label">Filter by Period</label>
-                            <select class="form-select" id="periodFilter">
-                                <option value="">All Periods</option>
-                                <option value="Daily">Daily</option>
-                                <option value="Weekly">Weekly</option>
-                                <option value="Monthly">Monthly</option>
-                                <option value="Yearly">Yearly</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="userFilter" class="form-label">Filter by User</label>
-                            <select class="form-select" id="userFilter">
-                                <option value="">All Users</option>
-                                <% if (locals.budgets) { 
-                                    let users = new Set();
-                                    locals.budgets.forEach(budget => {
-                                        if (budget.user_name) users.add(budget.user_name);
-                                    });
-                                    users.forEach(user => { %>
-                                        <option value="<%= user %>"><%= user %></option>
-                                    <% });
-                                } %>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="teamFilter" class="form-label">Filter by Team</label>
-                            <select class="form-select" id="teamFilter">
-                                <option value="">All Teams</option>
-                                <% if (locals.budgets) { 
-                                    let teams = new Set();
-                                    locals.budgets.forEach(budget => {
-                                        if (budget.team_name) teams.add(budget.team_name);
-                                    });
-                                    teams.forEach(team => { %>
-                                        <option value="<%= team %>"><%= team %></option>
-                                    <% });
-                                } %>
-                            </select>
-                        </div>
-                        <div class="col-md-3 d-flex align-items-end">
-                            <button class="btn btn-outline-secondary w-100" id="resetFilters">
-                                <i class="fas fa-redo me-1"></i>Reset Filters
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Budgets Table -->
-                <div class="card shadow">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">
-                            <i class="fas fa-list me-2"></i>All Budgets
-                            <% if (locals.budgets && locals.budgets.length > 0) { %>
-                                <span class="badge bg-primary ms-2"><%= locals.budgets.length %> budgets</span>
-                            <% } %>
-                        </h5>
-                        <div class="text-muted small">
-                            Showing all active budgets
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <% if (locals.budgets && locals.budgets.length > 0) { %>
-                            <div class="table-responsive">
-                                <table class="table table-hover" id="budgetsTable">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Category</th>
-                                            <th>Amount</th>
-                                            <th>Period</th>
-                                            <th>User</th>
-                                            <th>Team</th>
-                                            <th>Start Date</th>
-                                            <th>End Date</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% locals.budgets.forEach(budget => { %>
-                                            <tr class="budget-row" 
-                                                data-period="<%= budget.period %>"
-                                                data-user="<%= budget.user_name || '' %>"
-                                                data-team="<%= budget.team_name || '' %>">
-                                                <td><strong>#<%= budget.id %></strong></td>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="fas fa-folder text-primary me-2"></i>
-                                                        <span class="fw-bold"><%= budget.category %></span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <span class="fw-bold text-success">
-                                                        $<%= parseFloat(budget.amount).toFixed(2) %>
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span class="badge period-<%= budget.period ? budget.period.toLowerCase() : 'monthly' %>">
-                                                        <i class="fas fa-<%= 
-                                                            budget.period === 'Daily' ? 'calendar-day' : 
-                                                            budget.period === 'Weekly' ? 'calendar-week' :
-                                                            budget.period === 'Yearly' ? 'calendar-year' : 
-                                                            'calendar-alt' 
-                                                        %> me-1"></i>
-                                                        <%= budget.period %>
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="fas fa-user text-muted me-2"></i>
-                                                        <span><%= budget.user_name || 'N/A' %></span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="d-flex align-items-center">
-                                                        <i class="fas fa-users text-muted me-2"></i>
-                                                        <span><%= budget.team_name || 'N/A' %></span>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <small class="text-muted">
-                                                        <%= budget.start_date ? new Date(budget.start_date).toLocaleDateString() : 'N/A' %>
-                                                    </small>
-                                                </td>
-                                                <td>
-                                                    <small class="text-muted">
-                                                        <%= budget.end_date ? new Date(budget.end_date).toLocaleDateString() : 'N/A' %>
-                                                    </small>
-                                                </td>
-                                                <td>
-                                                    <div class="btn-group btn-group-sm">
-                                                        <a href="/admin/budgets/edit/<%= budget.id %>" class="btn btn-outline-primary" title="Edit Budget">
-                                                            <i class="fas fa-edit"></i>
-                                                        </a>
-                                                        <form action="/admin/budgets/delete/<%= budget.id %>" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this budget?');">
-                                                            <button type="submit" class="btn btn-outline-danger" title="Delete Budget">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        <% }); %>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <% } else { %>
-                            <div class="text-center py-5">
-                                <i class="fas fa-wallet fa-3x text-muted mb-3"></i>
-                                <h5 class="text-muted">No Budgets Found</h5>
-                                <p class="text-muted">There are no budgets in the system yet.</p>
-                                <a href="/admin/budgets/create" class="btn btn-primary">
-                                    <i class="fas fa-plus me-1"></i>Create First Budget
-                                </a>
-                            </div>
-                        <% } %>
-                    </div>
-                </div>
-
-                <!-- Helpful links -->
-                <div class="mt-3 text-center">
-                    <small class="text-muted">
-                        <a href="/admin/fix-budgets-table" target="_blank" class="text-decoration-none">Fix Budgets Table</a> | 
-                        <a href="/admin/check-budgets-columns" target="_blank" class="text-decoration-none">Check Table Structure</a> |
-                        <a href="/admin/reports" class="text-decoration-none">View Reports</a>
-                    </small>
-                </div>
-            </main>
+            </div>
         </div>
-    </div>
+
+        <!-- Helpful links -->
+        <div class="mt-3 text-center">
+            <small class="text-muted">
+                <a href="/admin/fix-budgets-table" target="_blank" class="text-decoration-none">Fix Budgets Table</a> | 
+                <a href="/admin/check-budgets-columns" target="_blank" class="text-decoration-none">Check Table Structure</a> |
+                <a href="/admin/reports" class="text-decoration-none">View Reports</a>
+            </small>
+        </div>
+    </div><!-- end fm-main -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -422,17 +382,10 @@
 
             // Initialize filters based on URL parameters
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('period')) {
-                periodFilter.value = urlParams.get('period');
-            }
-            if (urlParams.get('user')) {
-                userFilter.value = urlParams.get('user');
-            }
-            if (urlParams.get('team')) {
-                teamFilter.value = urlParams.get('team');
-            }
+            if (urlParams.get('period')) periodFilter.value = urlParams.get('period');
+            if (urlParams.get('user')) userFilter.value = urlParams.get('user');
+            if (urlParams.get('team')) teamFilter.value = urlParams.get('team');
             
-            // Apply initial filters
             filterBudgets();
         });
     </script>

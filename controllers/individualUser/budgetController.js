@@ -60,7 +60,7 @@ const budgetController = {
         user: req.user,
         categories: require('../../config/appConfig').EXPENSE_CATEGORIES,
         periods: require('../../config/appConfig').BUDGET_PERIODS,
-        error: 'An error occurred while adding budget'
+        error: "Couldn't add the budget. Please try again."
       });
     }
   },
@@ -127,7 +127,7 @@ const budgetController = {
       console.error('Delete budget error:', error);
       
       if (req.xhr || req.headers.accept?.includes('application/json')) {
-        return res.status(500).json({ success: false, message: 'Error deleting budget' });
+        return res.status(500).json({ success: false, message: "Couldn't delete the budget. Please try again." });
       }
       
       res.redirect('/user/budgets');

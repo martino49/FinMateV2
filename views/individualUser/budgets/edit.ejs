@@ -25,11 +25,6 @@
         }
 
 
-        .main-content {
-            background-color: #f8f9fc;
-            min-height: 100vh;
-        }
-
         .page-header {
             background: #fff;
             border-radius: 15px;
@@ -284,14 +279,22 @@
 </head>
 
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <%- include('../../partials/sidebar', { activePage: 'budgets' }) %>
-
-                <!-- Main content -->
-                <main class="main-content px-md-4">
-
+<%- include('../../partials/sidebar', { user: user, currentPage: 'budgets', notificationCount: typeof notificationCount !== 'undefined' ? notificationCount : 0 }) %>
+<div class="fm-main">
+    <nav class="fm-topbar">
+        <div class="fm-topbar-left">
+            <a class="fm-topbar-brand" href="/user/dashboard">
+                <span class="fm-topbar-brand-icon"><i class="fas fa-chart-line"></i></span>
+                <span class="fm-topbar-brand-text">FinMate</span>
+            </a>
+            <button class="fm-topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <span class="fm-topbar-title">Edit Budget</span>
+        </div>
+        <div class="fm-topbar-right">
+            <a href="/user/notifications"><i class="fas fa-bell"></i></a>
+            <a href="/auth/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i></a>
+        </div>
+    </nav>
                     <!-- Page Header -->
                     <div class="page-header fade-in-up">
                         <div class="d-flex justify-content-between align-items-center flex-wrap">
@@ -447,9 +450,8 @@
                                                     <% } %>
                                         </div>
                                     </div>
-                </main>
-        </div>
-    </div>
+                
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -497,6 +499,8 @@
             });
         });
     </script>
+<!-- end fm-main -->
+</div>
 </body>
 
 </html>

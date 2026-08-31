@@ -30,64 +30,6 @@
             overflow-x: hidden;
         }
 
-        .container-fluid {
-            padding: 0;
-        }
-
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            position: fixed;
-            width: 250px;
-            z-index: 1000;
-        }
-
-        .sidebar-sticky {
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            padding-top: 20px;
-            overflow-y: auto;
-        }
-
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            padding: 12px 20px;
-            margin: 4px 15px;
-            border-radius: var(--border-radius);
-            transition: var(--transition);
-        }
-
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-
-        .sidebar .nav-link i {
-            width: 20px;
-            margin-right: 10px;
-        }
-
-        .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            margin-bottom: 20px;
-        }
-
-        .sidebar-header h4 {
-            margin: 0;
-            font-weight: 700;
-        }
-
-        main {
-            margin-left: 250px;
-            padding: 20px;
-            min-height: 100vh;
-        }
-
         .page-header {
             display: flex;
             justify-content: space-between;
@@ -359,16 +301,6 @@
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                position: relative;
-                min-height: auto;
-            }
-            
-            main {
-                margin-left: 0;
-            }
-            
             .page-header {
                 flex-direction: column;
                 align-items: flex-start;
@@ -412,63 +344,22 @@
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <!-- <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="sidebar-sticky">
-                    <div class="sidebar-header">
-                        <h4><i class="fas fa-shield-alt me-2"></i>Super Admin</h4>
-                    </div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="/super-admin/dashboard">
-                                <i class="fas fa-tachometer-alt"></i>
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="/super-admin/users">
-                                <i class="fas fa-users"></i>
-                                User Management
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/super-admin/roles">
-                                <i class="fas fa-user-tag"></i>
-                                Role Management
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/super-admin/permissions">
-                                <i class="fas fa-key"></i>
-                                Permissions
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/super-admin/teams">
-                                <i class="fas fa-layer-group"></i>
-                                Team Management
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/super-admin/settings">
-                                <i class="fas fa-cog"></i>
-                                Settings
-                            </a>
-                        </li>
-                        <li class="nav-item mt-4">
-                            <a class="nav-link text-warning" href="/logout">
-                                <i class="fas fa-sign-out-alt"></i>
-                                Logout
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav> -->
-            <%- include('../../partials/superadmin-sidebar') %>
-            <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+    <%- include('../../partials/sidebar', { user: user, currentPage: 'users' }) %>
+    <div class="fm-main">
+        <nav class="fm-topbar">
+            <div class="fm-topbar-left">
+                <a class="fm-topbar-brand" href="/super-admin/dashboard">
+                    <span class="fm-topbar-brand-icon"><i class="fas fa-chart-line"></i></span>
+                    <span class="fm-topbar-brand-text">FinMate</span>
+                </a>
+                <button class="fm-topbar-hamburger" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                <span class="fm-topbar-title">Users</span>
+            </div>
+            <div class="fm-topbar-right">
+                <a href="/super-admin/notifications"><i class="fas fa-bell"></i></a>
+                <a href="/auth/logout" class="logout-link"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </nav>
                 <div class="page-header">
                     <h1 class="page-title">User Management</h1>
                     <a href="/super-admin/users/add" class="btn btn-primary">
@@ -615,9 +506,8 @@
                         <% } %>
                     </div>
                 </div>
-            </main>
-        </div>
     </div>
+    <!-- end fm-main -->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>

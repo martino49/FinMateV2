@@ -22,7 +22,7 @@ const profileController = {
         return res.status(404).render('teamMember/error', {
           title: 'Profile Not Found - FinMate',
           user: req.user,
-          error: { message: 'User profile not found', status: 404 }
+          error: { message: "That profile couldn't be found.", status: 404 }
         });
       }
 
@@ -53,7 +53,7 @@ const profileController = {
       res.status(500).render('teamMember/error', {
         title: 'Error - FinMate',
         user: req.user,
-        error: { message: 'Failed to load profile', status: 500 }
+        error: { message: "Couldn't load your profile. Please try again.", status: 500 }
       });
     }
   },
@@ -88,7 +88,7 @@ const profileController = {
       res.status(500).render('teamMember/error', {
         title: 'Error - FinMate',
         user: req.user,
-        error: { message: 'Failed to load edit profile form', status: 500 }
+        error: { message: "Couldn't load the edit form. Please try again.", status: 500 }
       });
     }
   },
@@ -127,7 +127,7 @@ const profileController = {
       res.redirect('/team-member/profile?success=Profile updated successfully');
     } catch (error) {
       console.error('Profile update error:', error);
-      req.session.errors = ['Failed to update profile. Please try again.'];
+      req.session.errors = ["Couldn't update your profile. Please try again."];
       req.session.oldInput = req.body;
       res.redirect('/team-member/profile/edit');
     }
@@ -173,7 +173,7 @@ const profileController = {
       res.status(500).render('teamMember/error', {
         title: 'Error - FinMate',
         user: req.user,
-        error: { message: 'Failed to load settings', status: 500 }
+        error: { message: "Couldn't load your settings. Please try again.", status: 500 }
       });
     }
   },
@@ -241,7 +241,7 @@ const profileController = {
       res.redirect('/team-member/settings?success=Settings updated successfully');
     } catch (error) {
       console.error('Settings update error:', error);
-      req.session.errors = ['Failed to update settings. Please try again.'];
+      req.session.errors = ["Couldn't update your settings. Please try again."];
       res.redirect('/team-member/settings');
     }
   },
@@ -297,7 +297,7 @@ const profileController = {
       res.redirect('/team-member/settings?success=Password changed successfully');
     } catch (error) {
       console.error('Password change error:', error);
-      req.session.errors = ['Failed to change password. Please try again.'];
+      req.session.errors = ["Couldn't change your password. Please try again."];
       res.redirect('/team-member/settings');
     }
   }

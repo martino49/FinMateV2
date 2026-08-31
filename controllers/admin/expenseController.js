@@ -68,7 +68,7 @@ const expenseController = {
         teams,
         user: req.user,
         categories: require('../../config/appConfig').EXPENSE_CATEGORIES,
-        error: 'An error occurred while adding expense'
+        error: "Couldn't add the expense. Please try again."
       });
     }
   },
@@ -138,7 +138,7 @@ const expenseController = {
       console.error('Delete expense error:', error);
       
       if (req.xhr || req.headers.accept?.includes('application/json')) {
-        return res.status(500).json({ success: false, message: 'Error deleting expense' });
+        return res.status(500).json({ success: false, message: "Couldn't delete the expense. Please try again." });
       }
       
       res.redirect('/admin/expenses');
@@ -159,7 +159,7 @@ const expenseController = {
       console.error('Approve expense error:', error);
       
       if (req.xhr || req.headers.accept?.includes('application/json')) {
-        return res.status(500).json({ success: false, message: 'Error approving expense' });
+        return res.status(500).json({ success: false, message: "Couldn't approve the expense. Please try again." });
       }
       
       res.redirect('/admin/expenses');
@@ -180,7 +180,7 @@ const expenseController = {
       console.error('Reject expense error:', error);
       
       if (req.xhr || req.headers.accept?.includes('application/json')) {
-        return res.status(500).json({ success: false, message: 'Error rejecting expense' });
+        return res.status(500).json({ success: false, message: "Couldn't reject the expense. Please try again." });
       }
       
       res.redirect('/admin/expenses');

@@ -1303,6 +1303,50 @@ router.get('/notifications', async (req, res) => {
   }
 });
 
+// Mark single notification as read
+router.post('/notifications/mark-read/:id', async (req, res) => {
+  try {
+    await db.pool.execute('UPDATE notifications SET is_read = true WHERE id = ?', [req.params.id]);
+    res.redirect('/admin/notifications?success=Notification marked as read');
+  } catch (error) {
+    console.error('Mark read error:', error);
+    res.redirect('/admin/notifications?error=Failed to mark notification');
+  }
+});
+
+// Mark all notifications as read
+router.post('/notifications/mark-all-read', async (req, res) => {
+  try {
+    await db.pool.execute('UPDATE notifications SET is_read = true');
+    res.redirect('/admin/notifications?success=All notifications marked as read');
+  } catch (error) {
+    console.error('Mark all read error:', error);
+    res.redirect('/admin/notifications?error=Failed to mark all as read');
+  }
+});
+
+// Delete single notification
+router.post('/notifications/delete/:id', async (req, res) => {
+  try {
+    await db.pool.execute('DELETE FROM notifications WHERE id = ?', [req.params.id]);
+    res.redirect('/admin/notifications?success=Notification deleted');
+  } catch (error) {
+    console.error('Delete notification error:', error);
+    res.redirect('/admin/notifications?error=Failed to delete notification');
+  }
+});
+
+// Clear all notifications
+router.post('/notifications/clear-all', async (req, res) => {
+  try {
+    await db.pool.execute('DELETE FROM notifications');
+    res.redirect('/admin/notifications?success=All notifications cleared');
+  } catch (error) {
+    console.error('Clear all error:', error);
+    res.redirect('/admin/notifications?error=Failed to clear notifications');
+  }
+});
+
 // ======== SYSTEM ADMIN ROUTES (Super Admin only) ========
 
 // System Settings (Super Admin only)
