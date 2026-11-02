@@ -19,6 +19,22 @@
 
 ---
 
+## Docker (optional)
+
+Run the app and its database in containers:
+
+```bash
+export JWT_SECRET="$(openssl rand -hex 32)"
+export SESSION_SECRET="$(openssl rand -hex 32)"
+docker compose up --build
+```
+
+The app starts on http://localhost:3000. On first boot it creates the schema and seeds default roles, permissions, and role-permission mappings (`INIT_DB=true`); MySQL data persists in the `finmate_db_data` volume. To stop and remove the data: `docker compose down -v`.
+
+The image is a plain `node:20-slim` production build — `npm ci --omit=dev`, then `node server.js`. Environment variables for local MySQL are defaulted in `docker-compose.yml`; override with `DB_NAME`, `DB_USER`, `DB_PASSWORD`, or `PORT`.
+
+---
+
 ## Overview
 
 FinMate is a multi-page application (MPA) for managing personal and team finances. It supports five user roles with distinct permissions — from individual expense tracking to full platform administration.

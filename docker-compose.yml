@@ -1,0 +1,41 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_NAME:-finmate}
+      MYSQL_USER: ${DB_USER:-finmate}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-finmate-local-pw}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root-local-pw}
+    volumes:
+      - finmate_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      APP_NAME: FinMate
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-finmate}
+      DB_USER: ${DB_USER:-finmate}
+      DB_PASSWORD: ${DB_PASSWORD:-finmate-local-pw}
+      # Create tables and seed roles/permissions on first boot
+      INIT_DB: "true"
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET before running}
+      SESSION_SECRET: ${SESSION_SECRET:?set SESSION_SECRET before running}
+    ports:
+      - "${PORT:-3000}:3000"
+
+volumes:
+  finmate_db_data:
